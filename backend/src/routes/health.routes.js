@@ -12,7 +12,7 @@ router.get("/", async (req, res) => {
     return res.status(200).json({
       success: true,
       status: "healthy",
-      service: "clouddrop-api",
+      service: "azuredrop-api",
       database: "healthy",
       uptime: process.uptime(),
       responseTimeMs: Date.now() - startedAt,
@@ -24,7 +24,7 @@ router.get("/", async (req, res) => {
     return res.status(503).json({
       success: false,
       status: "unhealthy",
-      service: "clouddrop-api",
+      service: "azuredrop-api",
       database: "unhealthy",
       timestamp: new Date().toISOString(),
     });

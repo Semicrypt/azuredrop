@@ -46,13 +46,13 @@ export async function findShareByTokenHash(
           f.user_id,
           f.original_name,
           f.blob_name,
-          f.bucket_name,
+          f.container_name,
           f.mime_type,
           f.size_bytes,
           f.category,
           f.description,
-          f.storage_mode,
-          f.aws_connection_id,
+          f.storage_provider,
+          f.storage_provider AS storage_mode,
           f.uploaded_at
 
         FROM share_links sl

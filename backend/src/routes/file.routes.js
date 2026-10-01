@@ -92,7 +92,7 @@ router.delete(
   revokeShareController
 );
 
-// Delete file from S3 and PostgreSQL
+// Delete file from Azure Blob Storage and PostgreSQL
 //
 // DELETE /api/files/:id
 router.delete(

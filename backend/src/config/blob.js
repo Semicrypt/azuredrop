@@ -1,35 +1,84 @@
 import {
   BlobServiceClient,
+  StorageSharedKeyCredential,
 } from "@azure/storage-blob";
 
 import {
   DefaultAzureCredential,
 } from "@azure/identity";
 
-const connectionString =
-  process.env.AZURE_STORAGE_CONNECTION_STRING;
+function parseConnectionString(value) {
+  const parts = {};
 
-const accountName =
-  process.env.AZURE_STORAGE_ACCOUNT_NAME;
+  for (const segment of value.split(";")) {
+    if (!segment) {
+      continue;
+    }
+
+    const separatorIndex =
+      segment.indexOf("=");
+
+    if (separatorIndex === -1) {
+      continue;
+    }
+
+    const key =
+      segment.slice(
+        0,
+        separatorIndex
+      );
+
+    const entryValue =
+      segment.slice(
+        separatorIndex + 1
+      );
+
+    parts[key] =
+      entryValue;
+  }
+
+  return parts;
+}
+
+const connectionString =
+  process.env
+    .AZURE_STORAGE_CONNECTION_STRING;
+
+let resolvedAccountName =
+  process.env
+    .AZURE_STORAGE_ACCOUNT_NAME ||
+  null;
+
+let resolvedSharedKeyCredential =
+  null;
 
 let blobServiceClient;
 
 if (connectionString) {
-  /*
-   * Local development:
-   * connect to Azurite.
-   */
-  blobServiceClient =
-    BlobServiceClient.fromConnectionString(
+  const parsed =
+    parseConnectionString(
       connectionString
     );
+
+  resolvedAccountName =
+    parsed.AccountName ||
+    "devstoreaccount1";
+
+  if (parsed.AccountKey) {
+    resolvedSharedKeyCredential =
+      new StorageSharedKeyCredential(
+        resolvedAccountName,
+        parsed.AccountKey
+      );
+  }
+
+  blobServiceClient =
+    BlobServiceClient
+      .fromConnectionString(
+        connectionString
+      );
 } else {
-  /*
-   * Azure deployment:
-   * authenticate using Managed Identity
-   * through DefaultAzureCredential.
-   */
-  if (!accountName) {
+  if (!resolvedAccountName) {
     throw new Error(
       "AZURE_STORAGE_ACCOUNT_NAME is not configured"
     );
@@ -37,13 +86,28 @@ if (connectionString) {
 
   blobServiceClient =
     new BlobServiceClient(
-      `https://${accountName}.blob.core.windows.net`,
+      `https://${resolvedAccountName}.blob.core.windows.net`,
       new DefaultAzureCredential()
     );
 }
 
+export const accountName =
+  resolvedAccountName;
+
+export const sharedKeyCredential =
+  resolvedSharedKeyCredential;
+
 export const containerName =
-  process.env.AZURE_STORAGE_CONTAINER_NAME ||
+  process.env
+    .AZURE_STORAGE_CONTAINER_NAME ||
   "azuredrop-files";
+
+export const publicBlobEndpoint =
+  process.env
+    .AZURE_STORAGE_PUBLIC_BLOB_ENDPOINT ||
+  null;
+
+export const usingConnectionString =
+  Boolean(connectionString);
 
 export default blobServiceClient;

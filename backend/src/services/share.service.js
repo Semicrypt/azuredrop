@@ -4,14 +4,6 @@ import {
 } from "crypto";
 
 import {
-  GetObjectCommand,
-} from "@aws-sdk/client-s3";
-
-import {
-  getSignedUrl,
-} from "@aws-sdk/s3-request-presigner";
-
-import {
   findFileByIdForUser,
 } from "../repositories/file.repository.js";
 
@@ -23,7 +15,7 @@ import {
 } from "../repositories/share.repository.js";
 
 import {
-  getFileStorage,
+  createBlobReadUrl,
 } from "./storage.service.js";
 
 function hashToken(
@@ -202,34 +194,17 @@ export async function resolveShareToken(
     throw error;
   }
 
-  const storage =
-    await getFileStorage(
-      share
-    );
+  const downloadUrl =
+    await createBlobReadUrl({
+      containerName:
+        share.container_name,
 
-  const command =
-    new GetObjectCommand({
-      Bucket:
-        share.bucket_name,
-
-      Key:
+      blobName:
         share.blob_name,
 
-      ResponseContentDisposition:
-        `attachment; filename*=UTF-8''${encodeURIComponent(
-          share.original_name
-        )}`,
+      expiresIn:
+        300,
     });
-
-  const downloadUrl =
-    await getSignedUrl(
-      storage.client,
-      command,
-      {
-        expiresIn:
-          300,
-      }
-    );
 
   return {
     file: {
@@ -253,6 +228,9 @@ export async function resolveShareToken(
 
       storageMode:
         share.storage_mode,
+
+      storageProvider:
+        share.storage_provider,
     },
 
     expiresAt:
