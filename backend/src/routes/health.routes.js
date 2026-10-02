@@ -1,34 +1,108 @@
 import { Router } from "express";
+
 import pool from "../config/database.js";
+
+import blobServiceClient, {
+  containerName,
+} from "../config/blob.js";
 
 const router = Router();
 
-router.get("/", async (req, res) => {
-  const startedAt = Date.now();
+router.get(
+  "/",
+  async (req, res) => {
+    const startedAt =
+      Date.now();
 
-  try {
-    await pool.query("SELECT 1");
+    const [
+      databaseResult,
+      storageResult,
+    ] =
+      await Promise.allSettled([
+        pool.query(
+          "SELECT 1"
+        ),
 
-    return res.status(200).json({
-      success: true,
-      status: "healthy",
-      service: "clouddrop-api",
-      database: "healthy",
-      uptime: process.uptime(),
-      responseTimeMs: Date.now() - startedAt,
-      timestamp: new Date().toISOString(),
-    });
-  } catch (error) {
-    console.error("Health check failed:", error);
+        blobServiceClient
+          .getContainerClient(
+            containerName
+          )
+          .getProperties(),
+      ]);
 
-    return res.status(503).json({
-      success: false,
-      status: "unhealthy",
-      service: "clouddrop-api",
-      database: "unhealthy",
-      timestamp: new Date().toISOString(),
-    });
+    const databaseHealthy =
+      databaseResult.status ===
+      "fulfilled";
+
+    const storageHealthy =
+      storageResult.status ===
+      "fulfilled";
+
+    const healthy =
+      databaseHealthy &&
+      storageHealthy;
+
+    if (!databaseHealthy) {
+      console.error(
+        "Health check database failure:",
+        databaseResult.reason
+      );
+    }
+
+    if (!storageHealthy) {
+      console.error(
+        "Health check storage failure:",
+        storageResult.reason
+      );
+    }
+
+    const response = {
+      success:
+        healthy,
+
+      status:
+        healthy
+          ? "healthy"
+          : "unhealthy",
+
+      service:
+        "azuredrop-api",
+
+      database:
+        databaseHealthy
+          ? "healthy"
+          : "unhealthy",
+
+      storage:
+        storageHealthy
+          ? "healthy"
+          : "unhealthy",
+
+      storageProvider:
+        "azure_blob",
+
+      uptime:
+        process.uptime(),
+
+      responseTimeMs:
+        Date.now() -
+        startedAt,
+
+      timestamp:
+        new Date()
+          .toISOString(),
+    };
+
+    return res
+      .status(
+        healthy
+          ? 200
+          : 503
+      )
+      .json(
+        response
+      );
   }
-});
+);
 
 export default router;

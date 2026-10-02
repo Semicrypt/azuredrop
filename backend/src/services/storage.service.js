@@ -1,339 +1,269 @@
 import {
-  AssumeRoleCommand,
-  STSClient,
-} from "@aws-sdk/client-sts";
+  BlobSASPermissions,
+  SASProtocol,
+  generateBlobSASQueryParameters,
+} from "@azure/storage-blob";
 
-import {
-  S3Client,
-} from "@aws-sdk/client-s3";
+import blobServiceClient, {
+  accountName,
+  containerName as defaultContainerName,
+  publicBlobEndpoint,
+  sharedKeyCredential,
+} from "../config/blob.js";
 
-import {
-  randomUUID,
-} from "crypto";
-
-import managedS3 from "../config/s3.js";
-
-import {
-  findAwsConnectionById,
-  findAwsConnectionByUserId,
-} from "../repositories/aws.repository.js";
-
-import {
-  findBucketByNameForUser,
-  findDefaultBucketByUserId,
-} from "../repositories/aws-bucket.repository.js";
-
-async function assumeConnectionRole(
-  connection
-) {
-  if (
-    !connection?.role_arn ||
-    !connection?.external_id
-  ) {
-    const error =
-      new Error(
-        "AWS connection configuration is incomplete"
+export async function ensureStorageContainer() {
+  const containerClient =
+    blobServiceClient
+      .getContainerClient(
+        defaultContainerName
       );
 
-    error.status = 409;
+  await containerClient
+    .createIfNotExists();
 
-    throw error;
-  }
-
-  const sts =
-    new STSClient({
-      region:
-        connection.region ||
-        process.env.AWS_REGION,
-    });
-
-  const response =
-    await sts.send(
-      new AssumeRoleCommand({
-        RoleArn:
-          connection.role_arn,
-
-        ExternalId:
-          connection.external_id,
-
-        RoleSessionName:
-          `CloudDrop-${randomUUID()}`,
-
-        DurationSeconds:
-          3600,
-      })
-    );
-
-  const credentials =
-    response.Credentials;
-
-  if (
-    !credentials?.AccessKeyId ||
-    !credentials?.SecretAccessKey ||
-    !credentials?.SessionToken
-  ) {
-    throw new Error(
-      "AWS did not return temporary credentials"
-    );
-  }
-
-  return {
-    accessKeyId:
-      credentials.AccessKeyId,
-
-    secretAccessKey:
-      credentials.SecretAccessKey,
-
-    sessionToken:
-      credentials.SessionToken,
-
-    expiration:
-      credentials.Expiration,
-  };
+  return containerClient;
 }
 
-export async function createS3ClientForConnection(
-  connection,
-  targetRegion
-) {
-  if (
-    connection.status !==
-    "CONNECTED"
-  ) {
-    const error =
-      new Error(
-        "AWS account is not connected"
-      );
-
-    error.status = 409;
-
-    throw error;
-  }
-
-  const credentials =
-    await assumeConnectionRole(
-      connection
-    );
-
-  return new S3Client({
-    region:
-      targetRegion ||
-      connection.region,
-
-    credentials,
-  });
-}
-
-export async function getUploadStorage(
-  userId
-) {
-  const connection =
-    await findAwsConnectionByUserId(
-      userId
-    );
-
-  if (
-    connection?.status ===
-    "CONNECTED"
-  ) {
-    const defaultBucket =
-      await findDefaultBucketByUserId(
-        userId
-      );
-
-    /*
-     * Preferred path:
-     * use the user's registered
-     * default CloudDrop bucket.
-     */
-    if (defaultBucket) {
-      const client =
-        await createS3ClientForConnection(
-          connection,
-          defaultBucket.region
-        );
-
-      return {
-        client,
-
-        bucketName:
-          defaultBucket.bucket_name,
-
-        storageMode:
-          "CUSTOMER",
-
-        awsConnectionId:
-          connection.id,
-
-        region:
-          defaultBucket.region,
-
-        bucketId:
-          defaultBucket.id,
-      };
-    }
-
-    /*
-     * Compatibility fallback for
-     * connections created before
-     * multi-bucket support.
-     */
-    if (
-      connection.bucket_name &&
-      connection.region
-    ) {
-      const client =
-        await createS3ClientForConnection(
-          connection,
-          connection.region
-        );
-
-      return {
-        client,
-
-        bucketName:
-          connection.bucket_name,
-
-        storageMode:
-          "CUSTOMER",
-
-        awsConnectionId:
-          connection.id,
-
-        region:
-          connection.region,
-
-        bucketId:
-          null,
-      };
-    }
-  }
-
-  const managedBucket =
-    process.env.AWS_S3_BUCKET;
-
-  if (!managedBucket) {
-    throw new Error(
-      "AWS_S3_BUCKET environment variable is not configured"
-    );
-  }
+export async function getUploadStorage() {
+  const containerClient =
+    await ensureStorageContainer();
 
   return {
-    client:
-      managedS3,
+    containerClient,
 
-    bucketName:
-      managedBucket,
+    containerName:
+      defaultContainerName,
 
-    storageMode:
-      "MANAGED",
-
-    awsConnectionId:
-      null,
-
-    region:
-      process.env.AWS_REGION,
-
-    bucketId:
-      null,
+    storageProvider:
+      "azure_blob",
   };
 }
 
 export async function getFileStorage(
   file
 ) {
-  if (
-    file.storage_mode !==
-    "CUSTOMER"
-  ) {
-    return {
-      client:
-        managedS3,
+  const targetContainer =
+    file.container_name ||
+    defaultContainerName;
 
-      bucketName:
-        file.bucket_name,
-
-      storageMode:
-        "MANAGED",
-
-      region:
-        process.env.AWS_REGION,
-    };
-  }
-
-  if (
-    !file.aws_connection_id
-  ) {
+  if (!targetContainer) {
     const error =
       new Error(
-        "Customer AWS connection information is missing"
+        "Blob container information is missing"
       );
 
-    error.status = 409;
+    error.status = 500;
 
     throw error;
   }
 
-  const connection =
-    await findAwsConnectionById(
-      file.aws_connection_id
-    );
-
-  if (!connection) {
-    const error =
-      new Error(
-        "AWS connection for this file no longer exists"
+  const containerClient =
+    blobServiceClient
+      .getContainerClient(
+        targetContainer
       );
-
-    error.status = 409;
-
-    throw error;
-  }
-
-  if (
-    connection.status !==
-    "CONNECTED"
-  ) {
-    const error =
-      new Error(
-        "Reconnect your AWS account before accessing this file"
-      );
-
-    error.status = 409;
-
-    throw error;
-  }
-
-  const bucket =
-    await findBucketByNameForUser(
-      file.bucket_name,
-      file.user_id
-    );
-
-  const region =
-    bucket?.region ||
-    connection.region;
-
-  const client =
-    await createS3ClientForConnection(
-      connection,
-      region
-    );
 
   return {
-    client,
+    containerClient,
 
-    bucketName:
-      file.bucket_name,
+    containerName:
+      targetContainer,
 
-    storageMode:
-      "CUSTOMER",
-
-    region,
-
-    connection,
-
-    bucket:
-      bucket || null,
+    storageProvider:
+      "azure_blob",
   };
+}
+
+function makePublicBlobUrl(
+  blobUrl
+) {
+  if (!publicBlobEndpoint) {
+    return blobUrl;
+  }
+
+  const serviceUrl =
+    blobServiceClient
+      .url
+      .replace(
+        /\/+$/,
+        ""
+      );
+
+  const publicEndpoint =
+    publicBlobEndpoint.replace(
+      /\/+$/,
+      ""
+    );
+
+  return blobUrl.replace(
+    serviceUrl,
+    publicEndpoint
+  );
+}
+
+function getSafeDownloadName({
+  downloadName,
+  blobName,
+}) {
+  const fallbackName =
+    String(
+      blobName || "download"
+    )
+      .split("/")
+      .pop() ||
+    "download";
+
+  return String(
+    downloadName ||
+      fallbackName
+  )
+    .replace(
+      /["\\\r\n]/g,
+      "_"
+    )
+    .trim() ||
+    "download";
+}
+
+export async function createBlobReadUrl({
+  containerName,
+  blobName,
+  expiresIn = 300,
+  downloadName,
+}) {
+  if (!containerName) {
+    const error =
+      new Error(
+        "Blob container name is required"
+      );
+
+    error.status = 500;
+
+    throw error;
+  }
+
+  if (!blobName) {
+    const error =
+      new Error(
+        "Blob name is required"
+      );
+
+    error.status = 500;
+
+    throw error;
+  }
+
+  const startsOn =
+    new Date(
+      Date.now() -
+        5 * 60 * 1000
+    );
+
+  const expiresOn =
+    new Date(
+      Date.now() +
+        expiresIn * 1000
+    );
+
+  const safeDownloadName =
+    getSafeDownloadName({
+      downloadName,
+      blobName,
+    });
+
+  /*
+   * Content-Disposition is included
+   * in the SAS response overrides.
+   *
+   * This tells the browser to download
+   * the Blob rather than displaying
+   * supported content such as text,
+   * PDFs or images inline.
+   */
+  const options = {
+    containerName,
+    blobName,
+
+    permissions:
+      BlobSASPermissions.parse(
+        "r"
+      ),
+
+    startsOn,
+    expiresOn,
+
+    contentDisposition:
+      `attachment; filename="${safeDownloadName}"`,
+  };
+
+  let sasToken;
+
+  /*
+   * Local development / Azurite:
+   * sign using the emulator's
+   * development shared key.
+   */
+  if (sharedKeyCredential) {
+    options.protocol =
+      SASProtocol.HttpsAndHttp;
+
+    sasToken =
+      generateBlobSASQueryParameters(
+        options,
+        sharedKeyCredential
+      ).toString();
+  } else {
+    /*
+     * Azure production:
+     * use Microsoft Entra ID /
+     * Managed Identity to obtain
+     * a user delegation key.
+     */
+    options.protocol =
+      SASProtocol.Https;
+
+    if (!accountName) {
+      const error =
+        new Error(
+          "Azure Storage account name is required for user delegation SAS"
+        );
+
+      error.status = 500;
+
+      throw error;
+    }
+
+    const userDelegationKey =
+      await blobServiceClient
+        .getUserDelegationKey(
+          startsOn,
+          expiresOn
+        );
+
+    sasToken =
+      generateBlobSASQueryParameters(
+        options,
+        userDelegationKey,
+        accountName
+      ).toString();
+  }
+
+  const containerClient =
+    blobServiceClient
+      .getContainerClient(
+        containerName
+      );
+
+  const blobClient =
+    containerClient
+      .getBlobClient(
+        blobName
+      );
+
+  const publicUrl =
+    makePublicBlobUrl(
+      blobClient.url
+    );
+
+  return `${publicUrl}?${sasToken}`;
 }

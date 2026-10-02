@@ -7,7 +7,7 @@ export default function ProtectedRoute({
 }) {
   const token =
     localStorage.getItem(
-      "clouddrop_token"
+      "azuredrop_token"
     );
 
   if (!token) {

@@ -4,14 +4,20 @@ import helmet from "helmet";
 import morgan from "morgan";
 import multer from "multer";
 
+import {
+  corsOrigins,
+} from "./config/env.js";
+
 import healthRoutes from "./routes/health.routes.js";
 import authRoutes from "./routes/auth.routes.js";
 import fileRoutes from "./routes/file.routes.js";
 import shareRoutes from "./routes/share.routes.js";
-import awsRoutes from "./routes/aws.routes.js";
 
-const app =
-  express();
+import {
+  MAX_FILE_SIZE_MB,
+} from "./middleware/upload.middleware.js";
+
+const app = express();
 
 app.disable(
   "x-powered-by"
@@ -22,7 +28,50 @@ app.use(
 );
 
 app.use(
-  cors()
+  cors({
+    origin(
+      origin,
+      callback
+    ) {
+      if (
+        !origin ||
+        corsOrigins.includes(
+          origin
+        )
+      ) {
+        return callback(
+          null,
+          true
+        );
+      }
+
+      const error =
+        new Error(
+          "Origin not allowed by CORS"
+        );
+
+      error.status =
+        403;
+
+      return callback(
+        error
+      );
+    },
+
+    methods: [
+      "GET",
+      "POST",
+      "PUT",
+      "PATCH",
+      "DELETE",
+      "OPTIONS",
+    ],
+
+    allowedHeaders: [
+      "Content-Type",
+      "Authorization",
+    ],
+  })
 );
 
 app.use(
@@ -39,7 +88,9 @@ app.use(
 );
 
 app.use(
-  morgan("combined")
+  morgan(
+    "combined"
+  )
 );
 
 app.get(
@@ -51,10 +102,10 @@ app.get(
         success: true,
 
         name:
-          "CloudDrop API",
+          "AzureDrop API",
 
         description:
-          "Secure Cloud File Storage Platform on AWS",
+          "Secure Azure File Storage Platform",
 
         version:
           "1.0.0",
@@ -80,11 +131,6 @@ app.use(
 app.use(
   "/api/share",
   shareRoutes
-);
-
-app.use(
-  "/api/aws",
-  awsRoutes
 );
 
 app.use(
@@ -123,14 +169,17 @@ app.use(
       return res
         .status(400)
         .json({
-          success: false,
+          success:
+            false,
 
           message:
             "Validation failed",
 
           errors:
             error.issues.map(
-              (issue) => ({
+              (
+                issue
+              ) => ({
                 field:
                   issue.path.join(
                     "."
@@ -154,14 +203,11 @@ app.use(
         return res
           .status(413)
           .json({
-            success: false,
+            success:
+              false,
 
             message:
-              `File exceeds the maximum allowed size of ${
-                process.env
-                  .MAX_FILE_SIZE_MB ||
-                10
-              } MB`,
+              `File exceeds the maximum allowed size of ${MAX_FILE_SIZE_MB} MB`,
           });
       }
 
@@ -172,7 +218,8 @@ app.use(
         return res
           .status(400)
           .json({
-            success: false,
+            success:
+              false,
 
             message:
               "Only one file can be uploaded at a time",
@@ -186,7 +233,8 @@ app.use(
         return res
           .status(400)
           .json({
-            success: false,
+            success:
+              false,
 
             message:
               "Unexpected file field",
@@ -196,7 +244,8 @@ app.use(
       return res
         .status(400)
         .json({
-          success: false,
+          success:
+            false,
 
           message:
             error.message,
@@ -211,7 +260,8 @@ app.use(
           error.status
         )
         .json({
-          success: false,
+          success:
+            false,
 
           message:
             error.message,

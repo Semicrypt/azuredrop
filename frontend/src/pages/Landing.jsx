@@ -1,17 +1,12 @@
 import {
-  useState,
-} from "react";
-
-import {
   ArrowRight,
   Check,
   ChevronRight,
   Cloud,
   Database,
+  FileSearch,
   Files,
   HardDrive,
-  KeyRound,
-  Layers3,
   LockKeyhole,
   Menu,
   Server,
@@ -23,60 +18,55 @@ import {
 } from "lucide-react";
 
 import {
+  useState,
+} from "react";
+
+import {
   Link,
 } from "react-router-dom";
 
 import "./Landing.css";
 
-const productFeatures = [
+const features = [
   {
     icon: UploadCloud,
     title: "Secure file uploads",
     description:
-      "Upload documents, images, archives, spreadsheets, and other supported files through a protected storage workflow.",
+      "Upload supported documents, images, spreadsheets, archives and text files through an authenticated workflow.",
   },
   {
     icon: Cloud,
-    title: "Managed or your own AWS",
+    title: "Azure Blob Storage",
     description:
-      "Start with CloudDrop-managed storage or securely connect your own AWS account when you want deeper control.",
+      "Files are stored as private Azure Blob objects instead of being exposed through public storage URLs.",
   },
   {
-    icon: Database,
-    title: "Multi-bucket management",
+    icon: FileSearch,
+    title: "Search & categories",
     description:
-      "Create CloudDrop-controlled S3 buckets, inspect them, choose a default destination, and manage storage from one interface.",
-  },
-  {
-    icon: Layers3,
-    title: "Bucket versioning",
-    description:
-      "Enable or suspend S3 versioning directly from CloudDrop for supported buckets in your connected AWS account.",
+      "Find files quickly using searchable metadata and automatic categories maintained alongside every upload.",
   },
   {
     icon: Share2,
     title: "Temporary sharing",
     description:
-      "Create expiring file links backed by short-lived signed S3 access without making your objects publicly accessible.",
+      "Create expiring share links while keeping the underlying Azure Blob container private.",
+  },
+  {
+    icon: Database,
+    title: "PostgreSQL metadata",
+    description:
+      "File records, descriptions, categories, users and temporary share data stay organized in PostgreSQL.",
   },
   {
     icon: ShieldCheck,
     title: "Security by design",
     description:
-      "Cross-account IAM, external IDs, temporary STS credentials, private buckets, encryption, and ownership checks.",
+      "JWT authentication, private storage and short-lived access URLs keep the application workflow controlled.",
   },
 ];
 
-const securityItems = [
-  "Cross-account IAM roles",
-  "Unique External ID per connection",
-  "Temporary AWS STS credentials",
-  "Private S3 buckets",
-  "Block Public Access",
-  "Server-side encryption",
-];
-
-const architectureItems = [
+const architecture = [
   {
     label: "Frontend",
     value: "React + Vite",
@@ -91,7 +81,7 @@ const architectureItems = [
   },
   {
     label: "Storage",
-    value: "Amazon S3",
+    value: "Azure Blob Storage",
   },
   {
     label: "Deployment",
@@ -103,24 +93,12 @@ const architectureItems = [
   },
 ];
 
-function Brand() {
-  return (
-    <Link
-      className="landing-brand"
-      to="/"
-      aria-label="CloudDrop home"
-    >
-      <span className="landing-brand-mark">
-        <Cloud size={20} />
-      </span>
-
-      <strong>
-        Cloud
-        <em>Drop</em>
-      </strong>
-    </Link>
-  );
-}
+const securityItems = [
+  "Authenticated file operations",
+  "Private Azure Blob container",
+  "Short-lived signed downloads",
+  "Expiring public share links",
+];
 
 export default function Landing() {
   const [
@@ -128,26 +106,40 @@ export default function Landing() {
     setMobileMenuOpen,
   ] = useState(false);
 
-  const closeMobileMenu =
-    () => {
-      setMobileMenuOpen(
-        false
-      );
-    };
+  function closeMenu() {
+    setMobileMenuOpen(false);
+  }
 
   return (
-    <div className="landing-page">
-      <header className="landing-header">
-        <div className="landing-nav">
-          <Brand />
+    <div className="azure-landing">
+      <header className="azure-landing-header">
+        <div className="azure-landing-container azure-nav">
+          <Link
+            className="azure-landing-brand"
+            to="/"
+            aria-label="AzureDrop home"
+          >
+            <span>
+              <Cloud size={21} />
+            </span>
 
-          <nav className="landing-nav-links">
+            <div>
+              <strong>
+                Azure
+                <em>
+                  Drop
+                </em>
+              </strong>
+
+              <small>
+                Secure cloud storage
+              </small>
+            </div>
+          </Link>
+
+          <nav className="azure-desktop-nav">
             <a href="#features">
               Features
-            </a>
-
-            <a href="#aws">
-              AWS Storage
             </a>
 
             <a href="#security">
@@ -157,172 +149,141 @@ export default function Landing() {
             <a href="#architecture">
               Architecture
             </a>
+
+            <a href="#workflow">
+              Workflow
+            </a>
           </nav>
 
-          <div className="landing-nav-actions">
+          <div className="azure-nav-actions">
             <Link
-              className="landing-signin"
+              className="azure-nav-login"
               to="/login"
             >
               Sign in
             </Link>
 
             <Link
-              className="landing-nav-cta"
+              className="azure-nav-register"
               to="/register"
             >
-              Get started
+              Create account
 
               <ArrowRight
                 size={16}
               />
             </Link>
-          </div>
 
-          <button
-            className="landing-mobile-toggle"
-            type="button"
-            aria-label={
-              mobileMenuOpen
-                ? "Close navigation"
-                : "Open navigation"
-            }
-            aria-expanded={
-              mobileMenuOpen
-            }
-            onClick={() =>
-              setMobileMenuOpen(
-                (current) =>
-                  !current
-              )
-            }
-          >
-            {mobileMenuOpen ? (
-              <X size={22} />
-            ) : (
-              <Menu size={22} />
-            )}
-          </button>
+            <button
+              className="azure-mobile-toggle"
+              type="button"
+              aria-label="Open navigation"
+              onClick={() =>
+                setMobileMenuOpen(
+                  (current) =>
+                    !current
+                )
+              }
+            >
+              {mobileMenuOpen ? (
+                <X size={21} />
+              ) : (
+                <Menu size={21} />
+              )}
+            </button>
+          </div>
         </div>
 
         {mobileMenuOpen && (
-          <div className="landing-mobile-menu">
+          <div className="azure-mobile-menu">
             <a
               href="#features"
-              onClick={
-                closeMobileMenu
-              }
+              onClick={closeMenu}
             >
               Features
             </a>
 
             <a
-              href="#aws"
-              onClick={
-                closeMobileMenu
-              }
-            >
-              AWS Storage
-            </a>
-
-            <a
               href="#security"
-              onClick={
-                closeMobileMenu
-              }
+              onClick={closeMenu}
             >
               Security
             </a>
 
             <a
               href="#architecture"
-              onClick={
-                closeMobileMenu
-              }
+              onClick={closeMenu}
             >
               Architecture
             </a>
 
-            <div className="landing-mobile-actions">
-              <Link
-                to="/login"
-                onClick={
-                  closeMobileMenu
-                }
-              >
-                Sign in
-              </Link>
+            <a
+              href="#workflow"
+              onClick={closeMenu}
+            >
+              Workflow
+            </a>
 
-              <Link
-                className="primary"
-                to="/register"
-                onClick={
-                  closeMobileMenu
-                }
-              >
-                Create account
+            <Link
+              to="/login"
+              onClick={closeMenu}
+            >
+              Sign in
+            </Link>
 
-                <ArrowRight
-                  size={16}
-                />
-              </Link>
-            </div>
+            <Link
+              className="primary"
+              to="/register"
+              onClick={closeMenu}
+            >
+              Create account
+            </Link>
           </div>
         )}
       </header>
 
       <main>
-        <section className="landing-hero">
-          <div className="landing-grid-background" />
+        <section className="azure-hero">
+          <div className="azure-hero-grid" />
+          <div className="azure-hero-glow one" />
+          <div className="azure-hero-glow two" />
 
-          <div className="landing-glow landing-glow-one" />
+          <div className="azure-landing-container azure-hero-layout">
+            <div className="azure-hero-copy">
+              <div className="azure-hero-kicker">
+                <Zap size={14} />
 
-          <div className="landing-glow landing-glow-two" />
-
-          <div className="landing-container landing-hero-layout">
-            <div className="landing-hero-copy">
-              <div className="landing-eyebrow">
-                <span>
-                  <Zap size={14} />
-                </span>
-
-                Secure cloud file
-                management
+                AZURE-NATIVE FILE STORAGE
               </div>
 
               <h1>
-                Your files.
+                Secure files.
                 <br />
 
                 <span>
-                  Your cloud.
+                  Simple sharing.
                 </span>
 
                 <br />
 
-                Your control.
+                Built for Azure.
               </h1>
 
               <p>
-                CloudDrop combines
-                simple file
-                management with
-                secure AWS storage
-                controls — including
-                bring-your-own-AWS,
-                multiple S3 buckets,
-                versioning, sharing,
-                and automated
-                default-bucket
-                routing.
+                AzureDrop is a secure
+                cloud file platform for
+                uploading, organizing,
+                searching and sharing
+                files through Azure Blob
+                Storage and PostgreSQL.
               </p>
 
-              <div className="landing-hero-actions">
+              <div className="azure-hero-actions">
                 <Link
-                  className="landing-primary-button"
+                  className="azure-primary-button"
                   to="/register"
                 >
-                  Start with CloudDrop
+                  Start with AzureDrop
 
                   <ArrowRight
                     size={18}
@@ -330,469 +291,447 @@ export default function Landing() {
                 </Link>
 
                 <a
-                  className="landing-secondary-button"
-                  href="#features"
+                  className="azure-secondary-button"
+                  href="#architecture"
                 >
-                  Explore platform
+                  View architecture
 
                   <ChevronRight
-                    size={18}
+                    size={17}
                   />
                 </a>
               </div>
 
-              <div className="landing-trust-row">
-                <div>
-                  <Check size={15} />
+              <div className="azure-trust-row">
+                <span>
+                  <Check size={14} />
                   Private by default
-                </div>
+                </span>
 
-                <div>
-                  <Check size={15} />
-                  No customer access
-                  keys stored
-                </div>
+                <span>
+                  <Check size={14} />
+                  Expiring shares
+                </span>
 
-                <div>
-                  <Check size={15} />
-                  Expiring share links
-                </div>
+                <span>
+                  <Check size={14} />
+                  Azure Blob backed
+                </span>
               </div>
             </div>
 
-            <div className="landing-preview-wrap">
-              <div className="landing-preview-glow" />
+            <div className="azure-hero-platform">
+              <div className="azure-platform-header">
+                <div>
+                  <span>
+                    LIVE ARCHITECTURE
+                  </span>
 
-              <div className="landing-product-window">
-                <div className="landing-window-top">
-                  <div className="landing-window-brand">
-                    <span>
-                      <Cloud
-                        size={15}
+                  <strong>
+                    AzureDrop platform
+                  </strong>
+                </div>
+
+                <div className="azure-platform-status">
+                  <span />
+                  Ready
+                </div>
+              </div>
+
+              <div className="azure-platform-flow">
+                <div className="azure-flow-node user">
+                  <div>
+                    <Files size={20} />
+                  </div>
+
+                  <span>
+                    User
+                  </span>
+
+                  <small>
+                    Upload / search / share
+                  </small>
+                </div>
+
+                <div className="azure-flow-connector">
+                  <span />
+                </div>
+
+                <div className="azure-flow-node api">
+                  <div>
+                    <Server size={20} />
+                  </div>
+
+                  <span>
+                    AzureDrop API
+                  </span>
+
+                  <small>
+                    Node.js + Express
+                  </small>
+                </div>
+
+                <div className="azure-flow-branches">
+                  <div />
+
+                  <span />
+
+                  <div />
+                </div>
+
+                <div className="azure-flow-destinations">
+                  <div>
+                    <span className="icon blob">
+                      <Cloud size={19} />
+                    </span>
+
+                    <strong>
+                      Blob Storage
+                    </strong>
+
+                    <small>
+                      Private files
+                    </small>
+                  </div>
+
+                  <div>
+                    <span className="icon database">
+                      <Database
+                        size={19}
                       />
                     </span>
 
-                    CloudDrop
-                  </div>
+                    <strong>
+                      PostgreSQL
+                    </strong>
 
-                  <div className="landing-window-status">
-                    <span />
-
-                    AWS connected
-                  </div>
-                </div>
-
-                <div className="landing-window-body">
-                  <aside className="landing-preview-sidebar">
-                    <div className="active">
-                      <HardDrive
-                        size={17}
-                      />
-                    </div>
-
-                    <div>
-                      <Files
-                        size={17}
-                      />
-                    </div>
-
-                    <div>
-                      <Database
-                        size={17}
-                      />
-                    </div>
-
-                    <div>
-                      <ShieldCheck
-                        size={17}
-                      />
-                    </div>
-                  </aside>
-
-                  <div className="landing-preview-main">
-                    <div className="landing-preview-heading">
-                      <div>
-                        <span>
-                          Storage
-                          workspace
-                        </span>
-
-                        <strong>
-                          My AWS
-                          Buckets
-                        </strong>
-                      </div>
-
-                      <button
-                        type="button"
-                        tabIndex={-1}
-                      >
-                        +
-                        <span>
-                          Create bucket
-                        </span>
-                      </button>
-                    </div>
-
-                    <div className="landing-preview-stats">
-                      <div>
-                        <span>
-                          Buckets
-                        </span>
-
-                        <strong>
-                          2
-                        </strong>
-
-                        <small>
-                          1 default
-                        </small>
-                      </div>
-
-                      <div>
-                        <span>
-                          Files
-                        </span>
-
-                        <strong>
-                          128
-                        </strong>
-
-                        <small>
-                          Private
-                          storage
-                        </small>
-                      </div>
-
-                      <div>
-                        <span>
-                          Connection
-                        </span>
-
-                        <strong className="secure">
-                          Secure
-                        </strong>
-
-                        <small>
-                          AWS STS
-                        </small>
-                      </div>
-                    </div>
-
-                    <div className="landing-preview-buckets">
-                      <div className="landing-preview-bucket default">
-                        <div className="landing-preview-bucket-icon">
-                          <Database
-                            size={17}
-                          />
-                        </div>
-
-                        <div className="landing-preview-bucket-copy">
-                          <strong>
-                            clouddrop-projects
-                          </strong>
-
-                          <span>
-                            eu-north-1
-                          </span>
-                        </div>
-
-                        <div className="landing-preview-badge">
-                          Default
-                        </div>
-                      </div>
-
-                      <div className="landing-preview-bucket">
-                        <div className="landing-preview-bucket-icon">
-                          <Database
-                            size={17}
-                          />
-                        </div>
-
-                        <div className="landing-preview-bucket-copy">
-                          <strong>
-                            clouddrop-archive
-                          </strong>
-
-                          <span>
-                            eu-north-1
-                          </span>
-                        </div>
-
-                        <div className="landing-preview-badge secondary">
-                          Versioned
-                        </div>
-                      </div>
-                    </div>
+                    <small>
+                      Metadata
+                    </small>
                   </div>
                 </div>
               </div>
 
-              <div className="landing-floating-card secure">
+              <div className="azure-platform-footer">
                 <span>
                   <ShieldCheck
-                    size={18}
+                    size={15}
                   />
+                  Authenticated
                 </span>
 
-                <div>
-                  <strong>
-                    Secure IAM
-                  </strong>
-
-                  <small>
-                    STS temporary
-                    credentials
-                  </small>
-                </div>
-              </div>
-
-              <div className="landing-floating-card storage">
                 <span>
-                  <Database
-                    size={18}
+                  <LockKeyhole
+                    size={15}
                   />
+                  Private storage
                 </span>
-
-                <div>
-                  <strong>
-                    Multi-bucket
-                  </strong>
-
-                  <small>
-                    Set your default
-                    destination
-                  </small>
-                </div>
               </div>
             </div>
           </div>
+        </section>
 
-          <div className="landing-container landing-tech-strip">
-            <span>
-              Built with
-            </span>
+        <section className="azure-proof-strip">
+          <div className="azure-landing-container azure-proof-grid">
+            <div>
+              <strong>
+                Azure
+              </strong>
+
+              <span>
+                Cloud platform
+              </span>
+            </div>
 
             <div>
-              <strong>AWS</strong>
-              <strong>React</strong>
-              <strong>Node.js</strong>
-              <strong>PostgreSQL</strong>
-              <strong>Docker</strong>
-              <strong>Nginx</strong>
               <strong>
-                GitHub Actions
+                Blob
               </strong>
+
+              <span>
+                Object storage
+              </span>
+            </div>
+
+            <div>
+              <strong>
+                PostgreSQL
+              </strong>
+
+              <span>
+                Metadata layer
+              </span>
+            </div>
+
+            <div>
+              <strong>
+                Docker
+              </strong>
+
+              <span>
+                Containerized
+              </span>
+            </div>
+
+            <div>
+              <strong>
+                GitHub
+              </strong>
+
+              <span>
+                CI/CD workflow
+              </span>
             </div>
           </div>
         </section>
 
         <section
-          className="landing-section landing-features"
+          className="azure-section azure-features"
           id="features"
         >
-          <div className="landing-container">
-            <div className="landing-section-heading">
+          <div className="azure-landing-container">
+            <div className="azure-section-heading centered">
               <span>
-                Platform
-                capabilities
+                PLATFORM FEATURES
               </span>
 
               <h2>
-                Simple file
-                management.
-                <br />
-                Serious cloud
-                infrastructure.
+                Everything needed for
+                secure file management.
               </h2>
 
               <p>
-                CloudDrop makes
-                secure storage easy
-                to use while keeping
-                the infrastructure
-                controls that matter
-                to technical users.
+                AzureDrop combines
+                storage, metadata,
+                search and controlled
+                sharing without turning
+                cloud storage into a
+                public file server.
               </p>
             </div>
 
-            <div className="landing-feature-grid">
-              {productFeatures.map(
-                ({
-                  icon: Icon,
-                  title,
-                  description,
-                }) => (
-                  <article
-                    key={title}
-                    className="landing-feature-card"
-                  >
-                    <div className="landing-feature-icon">
-                      <Icon
-                        size={22}
-                      />
-                    </div>
+            <div className="azure-feature-grid">
+              {features.map(
+                (feature) => {
+                  const Icon =
+                    feature.icon;
 
-                    <h3>
-                      {title}
-                    </h3>
+                  return (
+                    <article
+                      key={
+                        feature.title
+                      }
+                    >
+                      <div>
+                        <Icon
+                          size={21}
+                        />
+                      </div>
 
-                    <p>
-                      {description}
-                    </p>
-                  </article>
-                )
+                      <h3>
+                        {
+                          feature.title
+                        }
+                      </h3>
+
+                      <p>
+                        {
+                          feature.description
+                        }
+                      </p>
+                    </article>
+                  );
+                }
               )}
             </div>
           </div>
         </section>
 
         <section
-          className="landing-section landing-aws-section"
-          id="aws"
+          className="azure-section azure-workflow-section"
+          id="workflow"
         >
-          <div className="landing-container landing-aws-layout">
-            <div className="landing-aws-copy">
-              <span className="landing-small-label">
-                Bring your own AWS
+          <div className="azure-landing-container azure-workflow-layout">
+            <div className="azure-workflow-copy">
+              <span>
+                FILE WORKFLOW
               </span>
 
               <h2>
-                Your S3 storage.
-                Managed through
-                CloudDrop.
+                From upload to secure
+                sharing.
               </h2>
 
               <p>
-                Connect an AWS
-                account using a
-                cross-account IAM
-                role. CloudDrop then
-                uses temporary STS
-                credentials to work
-                only with approved
-                storage resources.
+                Every file passes
+                through an authenticated
+                application workflow,
+                with its binary content
+                and metadata handled
+                separately.
               </p>
 
-              <div className="landing-aws-points">
+              <div className="azure-workflow-points">
                 <div>
-                  <Check size={14} />
-
-                  Create
-                  CloudDrop-controlled
-                  buckets
-                </div>
-
-                <div>
-                  <Check size={14} />
-
-                  Select the default
-                  upload bucket
-                </div>
-
-                <div>
-                  <Check size={14} />
-
-                  View files by bucket
-                </div>
-
-                <div>
-                  <Check size={14} />
-
-                  Enable or suspend
-                  versioning
-                </div>
-
-                <div>
-                  <Check size={14} />
-
-                  Guarded bucket
-                  deletion
-                </div>
-
-                <div>
-                  <Check size={14} />
-
-                  Existing managed
-                  files remain
-                  accessible
-                </div>
-              </div>
-
-              <Link
-                className="landing-inline-link"
-                to="/register"
-              >
-                Create your workspace
-
-                <ArrowRight
-                  size={17}
-                />
-              </Link>
-            </div>
-
-            <div className="landing-aws-visual">
-              <div className="landing-storage-tree">
-                <div className="landing-tree-root">
-                  <Cloud
-                    size={25}
-                  />
+                  <span>
+                    01
+                  </span>
 
                   <div>
-                    <span>
-                      CloudDrop
-                    </span>
-
                     <strong>
-                      Storage Router
+                      Authenticate
                     </strong>
+
+                    <p>
+                      Sign in before
+                      accessing private
+                      file operations.
+                    </p>
                   </div>
                 </div>
 
-                <div className="landing-tree-line" />
+                <div>
+                  <span>
+                    02
+                  </span>
 
-                <div className="landing-tree-branches">
-                  <article>
-                    <div className="landing-tree-icon managed">
-                      <HardDrive
-                        size={20}
-                      />
-                    </div>
-
-                    <span>
-                      Managed
-                      Storage
-                    </span>
-
+                  <div>
                     <strong>
-                      CloudDrop S3
+                      Upload
                     </strong>
 
-                    <small>
-                      Ready
-                      immediately
-                    </small>
-                  </article>
+                    <p>
+                      Validated files are
+                      stored in Azure
+                      Blob Storage.
+                    </p>
+                  </div>
+                </div>
 
-                  <article>
-                    <div className="landing-tree-icon aws">
-                      <Database
-                        size={20}
-                      />
-                    </div>
+                <div>
+                  <span>
+                    03
+                  </span>
 
-                    <span>
-                      My AWS
-                    </span>
-
+                  <div>
                     <strong>
-                      Default Bucket
+                      Organize
                     </strong>
 
-                    <small>
-                      STS assumed role
-                    </small>
-                  </article>
+                    <p>
+                      Metadata and
+                      categories are
+                      recorded in
+                      PostgreSQL.
+                    </p>
+                  </div>
+                </div>
+
+                <div>
+                  <span>
+                    04
+                  </span>
+
+                  <div>
+                    <strong>
+                      Share
+                    </strong>
+
+                    <p>
+                      Generate temporary
+                      links when external
+                      access is needed.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="azure-workflow-card">
+              <div className="azure-workflow-card-header">
+                <div>
+                  <Cloud size={20} />
+                </div>
+
+                <span>
+                  AzureDrop
+                  <small>
+                    File lifecycle
+                  </small>
+                </span>
+              </div>
+
+              <div className="azure-lifecycle">
+                <div>
+                  <UploadCloud
+                    size={18}
+                  />
+
+                  <span>
+                    Upload
+                  </span>
+                </div>
+
+                <i />
+
+                <div>
+                  <HardDrive
+                    size={18}
+                  />
+
+                  <span>
+                    Store
+                  </span>
+                </div>
+
+                <i />
+
+                <div>
+                  <FileSearch
+                    size={18}
+                  />
+
+                  <span>
+                    Find
+                  </span>
+                </div>
+
+                <i />
+
+                <div>
+                  <Share2
+                    size={18}
+                  />
+
+                  <span>
+                    Share
+                  </span>
+                </div>
+              </div>
+
+              <div className="azure-workflow-storage">
+                <div>
+                  <Cloud size={17} />
+
+                  <span>
+                    <strong>
+                      Azure Blob
+                    </strong>
+
+                    Private objects
+                  </span>
+                </div>
+
+                <div>
+                  <Database size={17} />
+
+                  <span>
+                    <strong>
+                      PostgreSQL
+                    </strong>
+
+                    File metadata
+                  </span>
                 </div>
               </div>
             </div>
@@ -800,80 +739,57 @@ export default function Landing() {
         </section>
 
         <section
-          className="landing-section landing-security"
+          className="azure-section azure-security-section"
           id="security"
         >
-          <div className="landing-container landing-security-layout">
-            <div className="landing-security-visual">
-              <div className="landing-security-ring ring-one" />
-              <div className="landing-security-ring ring-two" />
-              <div className="landing-security-ring ring-three" />
-
-              <div className="landing-security-core">
+          <div className="azure-landing-container azure-security-layout">
+            <div className="azure-security-card">
+              <div className="azure-security-shield">
                 <ShieldCheck
-                  size={40}
+                  size={42}
                 />
-
-                <strong>
-                  Protected
-                </strong>
-
-                <span>
-                  CloudDrop
-                </span>
               </div>
 
-              <div className="landing-security-chip chip-one">
-                <KeyRound
-                  size={17}
-                />
+              <strong>
+                Private by design
+              </strong>
 
-                STS
-              </div>
+              <span>
+                Controlled access
+              </span>
 
-              <div className="landing-security-chip chip-two">
-                <LockKeyhole
-                  size={17}
-                />
-
-                Private S3
-              </div>
+              <div className="azure-security-rings one" />
+              <div className="azure-security-rings two" />
             </div>
 
-            <div className="landing-security-copy">
-              <span className="landing-small-label">
-                Security model
+            <div className="azure-security-copy">
+              <span>
+                SECURITY MODEL
               </span>
 
               <h2>
-                Cloud storage
-                without handing over
-                permanent AWS
-                credentials.
+                Storage should not need
+                to be public to be
+                useful.
               </h2>
 
               <p>
-                CloudDrop's AWS
-                connection uses an
-                IAM role, unique
-                external ID and
-                short-lived STS
-                credentials rather
-                than requiring users
-                to store AWS access
-                keys in the
-                application.
+                AzureDrop keeps Blob
+                objects private and
+                exposes access only
+                through authenticated
+                application actions or
+                time-limited share
+                workflows.
               </p>
 
-              <div className="landing-security-list">
+              <div className="azure-security-list">
                 {securityItems.map(
                   (item) => (
                     <div key={item}>
-                      <span>
-                        <Check
-                          size={14}
-                        />
-                      </span>
+                      <Check
+                        size={15}
+                      />
 
                       {item}
                     </div>
@@ -885,142 +801,34 @@ export default function Landing() {
         </section>
 
         <section
-          className="landing-section landing-architecture"
+          className="azure-section azure-architecture-section"
           id="architecture"
         >
-          <div className="landing-container">
-            <div className="landing-section-heading centered">
+          <div className="azure-landing-container">
+            <div className="azure-section-heading">
               <span>
-                Cloud & DevOps
-                architecture
+                SYSTEM ARCHITECTURE
               </span>
 
               <h2>
-                Designed like a real
-                production service.
+                Built as a complete
+                cloud and DevOps
+                project.
               </h2>
 
               <p>
-                CloudDrop combines
-                application
-                development,
-                persistent
-                databases, AWS
-                storage, container
-                deployment, reverse
-                proxying, health
-                checks, and
-                automated CI/CD.
+                The application combines
+                frontend, API, database,
+                cloud storage,
+                containerization and
+                deployment automation.
               </p>
             </div>
 
-            <div className="landing-architecture-flow">
-              <article>
-                <div>
-                  <Files size={20} />
-                </div>
-
-                <span>
-                  Source
-                </span>
-
-                <strong>
-                  GitHub
-                </strong>
-              </article>
-
-              <ChevronRight
-                className="landing-flow-arrow"
-                size={20}
-              />
-
-              <article>
-                <div>
-                  <Zap size={20} />
-                </div>
-
-                <span>
-                  Automation
-                </span>
-
-                <strong>
-                  GitHub Actions
-                </strong>
-              </article>
-
-              <ChevronRight
-                className="landing-flow-arrow"
-                size={20}
-              />
-
-              <article>
-                <div>
-                  <Server
-                    size={20}
-                  />
-                </div>
-
-                <span>
-                  Runtime
-                </span>
-
-                <strong>
-                  Docker
-                </strong>
-              </article>
-
-              <ChevronRight
-                className="landing-flow-arrow"
-                size={20}
-              />
-
-              <article className="featured">
-                <div>
-                  <Cloud
-                    size={20}
-                  />
-                </div>
-
-                <span>
-                  Application
-                </span>
-
-                <strong>
-                  Node API
-                </strong>
-              </article>
-
-              <div className="landing-flow-services">
-                <div>
-                  <Database
-                    size={17}
-                  />
-
-                  PostgreSQL
-                </div>
-
-                <div>
-                  <HardDrive
-                    size={17}
-                  />
-
-                  AWS S3
-                </div>
-
-                <div>
-                  <ShieldCheck
-                    size={17}
-                  />
-
-                  Health checks
-                </div>
-              </div>
-            </div>
-
-            <div className="landing-architecture-grid">
-              {architectureItems.map(
+            <div className="azure-architecture-grid">
+              {architecture.map(
                 (item) => (
-                  <div
+                  <article
                     key={
                       item.label
                     }
@@ -1032,102 +840,107 @@ export default function Landing() {
                     <strong>
                       {item.value}
                     </strong>
-                  </div>
+                  </article>
                 )
               )}
+            </div>
+
+            <div className="azure-deployment-note">
+              <Server size={20} />
+
+              <div>
+                <strong>
+                  Production deployment
+                  target
+                </strong>
+
+                <p>
+                  Azure VM → Node.js API
+                  → Azure Blob Storage +
+                  PostgreSQL, fronted by
+                  Nginx and automated
+                  through GitHub Actions.
+                </p>
+              </div>
             </div>
           </div>
         </section>
 
-        <section className="landing-final">
-          <div className="landing-container">
-            <div className="landing-final-card">
-              <div className="landing-final-glow" />
+        <section className="azure-final-cta">
+          <div className="azure-final-glow" />
 
-              <div className="landing-final-icon">
-                <Cloud
-                  size={24}
-                />
-              </div>
+          <div className="azure-landing-container azure-final-layout">
+            <div>
+              <span>
+                AZUREDROP
+              </span>
 
               <h2>
-                Put your files in a
-                cloud you control.
+                Your files deserve a
+                better cloud workflow.
               </h2>
 
               <p>
-                Start with
-                CloudDrop-managed
-                storage or connect
-                your AWS account and
-                take control of your
-                own S3 buckets.
+                Upload, organize,
+                download and share from
+                one secure Azure-backed
+                workspace.
               </p>
+            </div>
 
-              <div className="landing-final-actions">
-                <Link
-                  className="landing-primary-button"
-                  to="/register"
-                >
-                  Create account
+            <div>
+              <Link
+                to="/register"
+              >
+                Create your account
 
-                  <ArrowRight
-                    size={18}
-                  />
-                </Link>
+                <ArrowRight
+                  size={18}
+                />
+              </Link>
 
-                <Link
-                  className="landing-secondary-button"
-                  to="/login"
-                >
-                  Sign in
-                </Link>
-              </div>
+              <Link
+                to="/login"
+              >
+                Sign in
+              </Link>
             </div>
           </div>
         </section>
       </main>
 
-      <footer className="landing-footer">
-        <div className="landing-container landing-footer-content">
-          <div>
-            <Brand />
+      <footer className="azure-landing-footer">
+        <div className="azure-landing-container azure-footer-layout">
+          <div className="azure-footer-brand">
+            <span>
+              <Cloud size={19} />
+            </span>
 
-            <p>
-              Secure file storage
-              with AWS-powered
-              control.
-            </p>
+            <strong>
+              Azure
+              <em>
+                Drop
+              </em>
+            </strong>
           </div>
 
-          <div className="landing-footer-links">
+          <nav>
             <a href="#features">
               Features
-            </a>
-
-            <a href="#aws">
-              AWS Storage
             </a>
 
             <a href="#security">
               Security
             </a>
 
-            <Link to="/login">
-              Sign in
-            </Link>
-          </div>
+            <a href="#architecture">
+              Architecture
+            </a>
+          </nav>
 
-          <div className="landing-footer-bottom">
-            <span>
-              © 2026 CloudDrop
-            </span>
-
-            <span>
-              Built for secure cloud
-              storage.
-            </span>
-          </div>
+          <span>
+            © 2026 AzureDrop
+          </span>
         </div>
       </footer>
     </div>

@@ -4,69 +4,66 @@ export async function createFileRecord({
   userId,
   originalName,
   blobName,
-  bucketName,
+  containerName,
   mimeType,
   sizeBytes,
   category,
   description,
-  storageMode,
-  awsConnectionId,
+  storageProvider = "azure_blob",
 }) {
-  const result = await pool.query(
-    `
-      INSERT INTO files (
-        user_id,
-        original_name,
-        blob_name,
-        bucket_name,
-        mime_type,
-        size_bytes,
-        category,
-        description,
-        storage_mode,
-        aws_connection_id
-      )
-      VALUES (
-        $1,
-        $2,
-        $3,
-        $4,
-        $5,
-        $6,
-        $7,
-        $8,
-        $9,
-        $10
-      )
+  const result =
+    await pool.query(
+      `
+        INSERT INTO files (
+          user_id,
+          original_name,
+          blob_name,
+          container_name,
+          mime_type,
+          size_bytes,
+          category,
+          description,
+          storage_provider
+        )
+        VALUES (
+          $1,
+          $2,
+          $3,
+          $4,
+          $5,
+          $6,
+          $7,
+          $8,
+          $9
+        )
 
-      RETURNING
-        id,
-        user_id,
-        original_name,
-        blob_name,
-        bucket_name,
-        mime_type,
-        size_bytes,
+        RETURNING
+          id,
+          user_id,
+          original_name,
+          blob_name,
+          container_name,
+          mime_type,
+          size_bytes,
+          category,
+          description,
+          storage_provider,
+          storage_provider AS storage_mode,
+          uploaded_at,
+          updated_at
+      `,
+      [
+        userId,
+        originalName,
+        blobName,
+        containerName,
+        mimeType,
+        sizeBytes,
         category,
-        description,
-        storage_mode,
-        aws_connection_id,
-        uploaded_at,
-        updated_at
-    `,
-    [
-      userId,
-      originalName,
-      blobName,
-      bucketName,
-      mimeType,
-      sizeBytes,
-      category,
-      description || null,
-      storageMode,
-      awsConnectionId || null,
-    ]
-  );
+        description || null,
+        storageProvider,
+      ]
+    );
 
   return result.rows[0];
 }
@@ -113,7 +110,8 @@ export async function findFilesByUser({
           size_bytes,
           category,
           description,
-          storage_mode,
+          storage_provider,
+          storage_provider AS storage_mode,
           uploaded_at,
           updated_at
         FROM files
@@ -140,13 +138,13 @@ export async function findFileByIdForUser(
           user_id,
           original_name,
           blob_name,
-          bucket_name,
+          container_name,
           mime_type,
           size_bytes,
           category,
           description,
-          storage_mode,
-          aws_connection_id,
+          storage_provider,
+          storage_provider AS storage_mode,
           uploaded_at,
           updated_at
         FROM files
@@ -181,7 +179,8 @@ export async function findFileMetadataByIdForUser(
           size_bytes,
           category,
           description,
-          storage_mode,
+          storage_provider,
+          storage_provider AS storage_mode,
           uploaded_at,
           updated_at
         FROM files

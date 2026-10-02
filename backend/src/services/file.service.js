@@ -1,14 +1,4 @@
 import {
-  DeleteObjectCommand,
-  GetObjectCommand,
-  PutObjectCommand,
-} from "@aws-sdk/client-s3";
-
-import {
-  getSignedUrl,
-} from "@aws-sdk/s3-request-presigner";
-
-import {
   randomUUID,
 } from "crypto";
 
@@ -25,6 +15,7 @@ import {
 } from "../utils/file-category.js";
 
 import {
+  createBlobReadUrl,
   getFileStorage,
   getUploadStorage,
 } from "./storage.service.js";
@@ -35,9 +26,7 @@ export async function uploadFile({
   description,
 }) {
   const storage =
-    await getUploadStorage(
-      userId
-    );
+    await getUploadStorage();
 
   const extension =
     file.originalname.includes(
@@ -58,24 +47,24 @@ export async function uploadFile({
       file.mimetype
     );
 
-  const objectKey =
+  const blobName =
     `users/${userId}/${category}/${uniqueName}`;
 
-  await storage.client.send(
-    new PutObjectCommand({
-      Bucket:
-        storage.bucketName,
+  const blockBlobClient =
+    storage.containerClient
+      .getBlockBlobClient(
+        blobName
+      );
 
-      Key:
-        objectKey,
+  await blockBlobClient.uploadData(
+    file.buffer,
+    {
+      blobHTTPHeaders: {
+        blobContentType:
+          file.mimetype,
+      },
 
-      Body:
-        file.buffer,
-
-      ContentType:
-        file.mimetype,
-
-      Metadata: {
+      metadata: {
         originalname:
           encodeURIComponent(
             file.originalname
@@ -84,7 +73,7 @@ export async function uploadFile({
         userid:
           userId,
       },
-    })
+    }
   );
 
   try {
@@ -94,11 +83,10 @@ export async function uploadFile({
       originalName:
         file.originalname,
 
-      blobName:
-        objectKey,
+      blobName,
 
-      bucketName:
-        storage.bucketName,
+      containerName:
+        storage.containerName,
 
       mimeType:
         file.mimetype,
@@ -110,22 +98,12 @@ export async function uploadFile({
 
       description,
 
-      storageMode:
-        storage.storageMode,
-
-      awsConnectionId:
-        storage.awsConnectionId,
+      storageProvider:
+        storage.storageProvider,
     });
   } catch (error) {
-    await storage.client.send(
-      new DeleteObjectCommand({
-        Bucket:
-          storage.bucketName,
-
-        Key:
-          objectKey,
-      })
-    );
+    await blockBlobClient
+      .deleteIfExists();
 
     throw error;
   }
@@ -188,34 +166,20 @@ export async function createFileDownloadUrl({
     throw error;
   }
 
-  const storage =
-    await getFileStorage(
-      file
-    );
+  const url =
+    await createBlobReadUrl({
+      containerName:
+        file.container_name,
 
-  const command =
-    new GetObjectCommand({
-      Bucket:
-        file.bucket_name,
-
-      Key:
+      blobName:
         file.blob_name,
 
-      ResponseContentDisposition:
-        `attachment; filename*=UTF-8''${encodeURIComponent(
-          file.original_name
-        )}`,
-    });
+      expiresIn:
+        300,
 
-  const url =
-    await getSignedUrl(
-      storage.client,
-      command,
-      {
-        expiresIn:
-          300,
-      }
-    );
+      downloadName:
+        file.original_name,
+    });
 
   return {
     file: {
@@ -236,6 +200,9 @@ export async function createFileDownloadUrl({
 
       storageMode:
         file.storage_mode,
+
+      storageProvider:
+        file.storage_provider,
     },
 
     downloadUrl:
@@ -272,15 +239,14 @@ export async function deleteUserFile({
       file
     );
 
-  await storage.client.send(
-    new DeleteObjectCommand({
-      Bucket:
-        file.bucket_name,
+  const blockBlobClient =
+    storage.containerClient
+      .getBlockBlobClient(
+        file.blob_name
+      );
 
-      Key:
-        file.blob_name,
-    })
-  );
+  await blockBlobClient
+    .deleteIfExists();
 
   const deleted =
     await deleteFileRecord(
@@ -308,5 +274,8 @@ export async function deleteUserFile({
 
     storageMode:
       file.storage_mode,
+
+    storageProvider:
+      file.storage_provider,
   };
 }

@@ -2,7 +2,6 @@ import {
   Check,
   Clock3,
   Copy,
-  Database,
   Download,
   FileText,
   HardDrive,
@@ -17,7 +16,6 @@ import {
 
 import {
   useEffect,
-  useMemo,
   useState,
 } from "react";
 
@@ -106,28 +104,6 @@ function formatDate(value) {
   }
 
   return date.toLocaleString();
-}
-
-function getStorageLabel(
-  storageMode
-) {
-  const value =
-    String(
-      storageMode || ""
-    ).toLowerCase();
-
-  if (
-    value.includes(
-      "customer"
-    ) ||
-    value.includes(
-      "aws"
-    )
-  ) {
-    return "My AWS";
-  }
-
-  return "Managed";
 }
 
 function isShareExpired(
@@ -226,6 +202,15 @@ export default function FileDetailsModal({
 
     let active = true;
 
+    setLoading(true);
+    setSharesLoading(true);
+    setMetadata(null);
+    setShares([]);
+    setError("");
+    setShareUrl("");
+    setCopied(false);
+    setConfirmDelete(false);
+
     async function loadInitialData() {
       try {
         const [
@@ -272,10 +257,7 @@ export default function FileDetailsModal({
       } finally {
         if (active) {
           setLoading(false);
-
-          setSharesLoading(
-            false
-          );
+          setSharesLoading(false);
         }
       }
     }
@@ -294,17 +276,7 @@ export default function FileDetailsModal({
     metadata || file;
 
   const storageLabel =
-    useMemo(
-      () =>
-        getStorageLabel(
-          currentFile
-            ?.storage_mode
-        ),
-      [
-        currentFile
-          ?.storage_mode,
-      ]
-    );
+    "Azure Blob Storage";
 
   if (
     !open ||
@@ -631,16 +603,9 @@ export default function FileDetailsModal({
           <>
             <section className="file-details-storage-card">
               <div className="file-details-storage-icon">
-                {storageLabel ===
-                "My AWS" ? (
-                  <Database
-                    size={18}
-                  />
-                ) : (
-                  <HardDrive
-                    size={18}
-                  />
-                )}
+                <HardDrive
+                  size={18}
+                />
               </div>
 
               <div>
@@ -653,10 +618,10 @@ export default function FileDetailsModal({
                 </strong>
 
                 <p>
-                  {storageLabel ===
-                  "My AWS"
-                    ? "Stored in your connected AWS S3 storage."
-                    : "Stored securely in CloudDrop managed storage."}
+                  Stored securely in
+                  your private Azure
+                  Blob Storage
+                  container.
                 </p>
               </div>
 
@@ -815,10 +780,10 @@ export default function FileDetailsModal({
             </div>
 
             <p>
-              This permanently removes
-              the file from CloudDrop
-              metadata and its storage
-              destination.
+              This permanently
+              removes the file from
+              AzureDrop metadata and
+              Azure Blob Storage.
             </p>
 
             <button
@@ -860,7 +825,7 @@ export default function FileDetailsModal({
             Create an expiring public
             link. Recipients can
             download the file without
-            signing in to CloudDrop.
+            signing in to AzureDrop.
           </p>
 
           <div className="file-details-share-create">

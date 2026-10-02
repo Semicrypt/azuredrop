@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS files (
 
     blob_name TEXT NOT NULL UNIQUE,
 
-    bucket_name TEXT,
+    container_name TEXT NOT NULL,
 
     mime_type VARCHAR(255) NOT NULL,
 
@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS files (
 
     storage_provider VARCHAR(50)
         NOT NULL
-        DEFAULT 's3',
+        DEFAULT 'azure_blob',
 
     uploaded_at TIMESTAMPTZ
         NOT NULL
@@ -53,13 +53,14 @@ CREATE TABLE IF NOT EXISTS files (
 CREATE INDEX IF NOT EXISTS idx_files_user_id
 ON files(user_id);
 
-
 CREATE INDEX IF NOT EXISTS idx_files_category
 ON files(category);
 
-
 CREATE INDEX IF NOT EXISTS idx_files_original_name
 ON files(original_name);
+
+CREATE INDEX IF NOT EXISTS idx_files_container_name
+ON files(container_name);
 
 
 CREATE TABLE IF NOT EXISTS share_links (
@@ -81,7 +82,6 @@ CREATE TABLE IF NOT EXISTS share_links (
 
 CREATE INDEX IF NOT EXISTS idx_share_links_token
 ON share_links(token);
-
 
 CREATE INDEX IF NOT EXISTS idx_share_links_expires_at
 ON share_links(expires_at);

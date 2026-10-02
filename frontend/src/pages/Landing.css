@@ -1,2601 +1,1252 @@
 /* =========================================================
-   CLOUDDROP LANDING PAGE
+   AZUREDROP LANDING
+   Aubergine / Ubuntu rust / warm cream
    ========================================================= */
 
-.landing-page {
+.azure-landing {
+  --az-aubergine: #351c18;
+  --az-aubergine-deep: #21110f;
+  --az-brown: #4b2922;
+  --az-rust: #c4512d;
+  --az-rust-dark: #a83f23;
+  --az-copper: #df784c;
+  --az-cream: #f6efe9;
+  --az-paper: #fffdfb;
+  --az-text: #271b18;
+  --az-muted: #79655d;
+  --az-border: #e6d8d0;
+  --az-green: #49735a;
+
   min-height: 100vh;
-
-  overflow: hidden;
-
-  color: #f8fafc;
-
-  background: #050914;
+  overflow-x: hidden;
+  background: var(--az-cream);
+  color: var(--az-text);
 }
 
-.landing-container,
-.landing-nav,
-.landing-mobile-menu {
-  width:
-    min(
-      calc(100% - 40px),
-      1220px
-    );
-
-  margin-inline: auto;
+.azure-landing-container {
+  width: min(1180px, calc(100% - 48px));
+  margin: 0 auto;
 }
 
-/* =========================================================
-   HEADER
-   ========================================================= */
+/* Navigation */
 
-.landing-header {
-  position: fixed;
-  z-index: 100;
-  top: 0;
-  right: 0;
-  left: 0;
-
-  border-bottom:
-    1px solid
-    rgba(148, 163, 184, 0.09);
-
-  background:
-    rgba(5, 9, 20, 0.82);
-
-  backdrop-filter:
-    blur(20px);
-
-  -webkit-backdrop-filter:
-    blur(20px);
+.azure-landing-header {
+  position: relative;
+  z-index: 50;
+  background: rgba(246, 239, 233, 0.92);
+  border-bottom: 1px solid rgba(230, 216, 208, 0.8);
+  backdrop-filter: blur(14px);
 }
 
-.landing-nav {
+.azure-nav {
+  min-height: 76px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-
-  height: 70px;
-}
-
-.landing-brand {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-
-  flex-shrink: 0;
-
-  color: #f8fafc;
-
-  text-decoration: none;
-}
-
-.landing-brand-mark {
-  display: grid;
-
-  width: 36px;
-  height: 36px;
-
-  place-items: center;
-
-  border:
-    1px solid
-    rgba(96, 165, 250, 0.32);
-
-  border-radius: 11px;
-
-  color: #ffffff;
-
-  background:
-    linear-gradient(
-      145deg,
-      #4385ff,
-      #2f68dc
-    );
-
-  box-shadow:
-    0 9px 25px
-    rgba(67, 133, 255, 0.23);
-}
-
-.landing-brand strong {
-  font-family:
-    "Manrope",
-    "DM Sans",
-    sans-serif;
-
-  font-size: 18px;
-  font-weight: 800;
-
-  letter-spacing:
-    -0.04em;
-}
-
-.landing-brand em {
-  color: #72a5ff;
-
-  font-style: normal;
-}
-
-.landing-nav-links {
-  display: flex;
-  align-items: center;
   gap: 30px;
 }
 
-.landing-nav-links a,
-.landing-signin {
-  color: #8796ab;
-
-  font-size: 12px;
-  font-weight: 700;
-
-  text-decoration: none;
-
-  transition:
-    color 160ms ease;
-}
-
-.landing-nav-links a:hover,
-.landing-signin:hover {
-  color: #ffffff;
-}
-
-.landing-nav-actions {
+.azure-landing-brand {
   display: flex;
   align-items: center;
-  gap: 19px;
-}
-
-.landing-nav-cta {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-
-  min-height: 40px;
-
-  padding:
-    0 15px;
-
-  border-radius: 10px;
-
-  color: #ffffff;
-
-  font-size: 12px;
-  font-weight: 800;
-
-  text-decoration: none;
-
-  background:
-    linear-gradient(
-      135deg,
-      #4385ff,
-      #326be0
-    );
-
-  box-shadow:
-    0 10px 26px
-    rgba(67, 133, 255, 0.2);
-
-  transition:
-    transform 160ms ease,
-    box-shadow 160ms ease;
-}
-
-.landing-nav-cta:hover {
-  transform:
-    translateY(-1px);
-
-  box-shadow:
-    0 13px 30px
-    rgba(67, 133, 255, 0.3);
-}
-
-.landing-mobile-toggle {
-  display: none;
-
-  width: 40px;
-  height: 40px;
-
-  padding: 0;
-
-  align-items: center;
-  justify-content: center;
-
-  border:
-    1px solid
-    rgba(148, 163, 184, 0.14);
-
-  border-radius: 10px;
-
-  color: #d6dfeb;
-
-  background:
-    rgba(255, 255, 255, 0.035);
-
-  cursor: pointer;
-}
-
-.landing-mobile-menu {
-  display: none;
-
-  padding:
-    12px 0 18px;
-}
-
-.landing-mobile-menu > a {
-  display: block;
-
-  padding:
-    12px 2px;
-
-  color: #99a8bb;
-
-  font-size: 13px;
-  font-weight: 700;
-
+  gap: 10px;
+  color: var(--az-text);
   text-decoration: none;
 }
 
-.landing-mobile-actions {
+.azure-landing-brand > span {
+  width: 39px;
+  height: 39px;
   display: grid;
-  grid-template-columns:
-    1fr 1fr;
-
-  gap: 9px;
-
-  margin-top: 10px;
+  place-items: center;
+  border-radius: 13px;
+  background: var(--az-aubergine);
+  color: #e98b63;
 }
 
-.landing-mobile-actions a {
-  display: inline-flex;
+.azure-landing-brand > div {
+  display: flex;
+  flex-direction: column;
+}
+
+.azure-landing-brand strong,
+.azure-footer-brand strong {
+  font-size: 19px;
+  letter-spacing: -0.5px;
+}
+
+.azure-landing-brand em,
+.azure-footer-brand em {
+  color: var(--az-rust);
+  font-style: normal;
+}
+
+.azure-landing-brand small {
+  margin-top: 3px;
+  color: var(--az-muted);
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.azure-desktop-nav {
+  display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 7px;
+  gap: 27px;
+}
 
-  min-height: 43px;
-
-  border:
-    1px solid
-    rgba(148, 163, 184, 0.14);
-
-  border-radius: 10px;
-
-  color: #c5d0df;
-
-  font-size: 12px;
-  font-weight: 800;
-
+.azure-desktop-nav a,
+.azure-nav-login {
+  color: var(--az-muted);
+  font-size: 11px;
+  font-weight: 650;
   text-decoration: none;
-
-  background:
-    rgba(255, 255, 255, 0.025);
 }
 
-.landing-mobile-actions a.primary {
-  border-color:
-    transparent;
-
-  color: #ffffff;
-
-  background:
-    linear-gradient(
-      135deg,
-      #4385ff,
-      #326be0
-    );
+.azure-desktop-nav a:hover,
+.azure-nav-login:hover {
+  color: var(--az-rust);
 }
 
-/* =========================================================
-   HERO
-   ========================================================= */
+.azure-nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
 
-.landing-hero {
+.azure-nav-register {
+  min-height: 39px;
+  padding: 0 14px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  border-radius: 10px;
+  background: var(--az-aubergine);
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.azure-nav-register:hover {
+  background: var(--az-brown);
+}
+
+.azure-mobile-toggle,
+.azure-mobile-menu {
+  display: none;
+}
+
+/* Hero */
+
+.azure-hero {
   position: relative;
-
-  min-height: 860px;
-
-  padding-top: 70px;
-
+  min-height: 690px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
   background:
     linear-gradient(
-      180deg,
-      rgba(12, 20, 37, 0.48),
-      rgba(5, 9, 20, 0)
+      125deg,
+      #291512 0%,
+      #351b17 52%,
+      #54281f 100%
     );
+  color: white;
 }
 
-.landing-grid-background {
+.azure-hero-grid {
   position: absolute;
-  inset: 70px 0 0;
-
-  opacity: 0.16;
-
+  inset: 0;
+  opacity: 0.12;
   background-image:
     linear-gradient(
-      rgba(105, 145, 205, 0.11)
-      1px,
+      rgba(255,255,255,.1) 1px,
       transparent 1px
     ),
     linear-gradient(
       90deg,
-      rgba(105, 145, 205, 0.11)
-      1px,
+      rgba(255,255,255,.1) 1px,
       transparent 1px
     );
-
-  background-size:
-    56px 56px;
-
+  background-size: 62px 62px;
   mask-image:
     linear-gradient(
       to bottom,
       black,
-      transparent 78%
+      transparent
     );
-
-  pointer-events: none;
 }
 
-.landing-glow {
+.azure-hero-glow {
   position: absolute;
-
   border-radius: 50%;
-
-  pointer-events: none;
-}
-
-.landing-glow-one {
-  top: 35px;
-  right: 2%;
-
-  width: 590px;
-  height: 590px;
-
-  background:
-    radial-gradient(
-      circle,
-      rgba(67, 133, 255, 0.13),
-      transparent 69%
-    );
-}
-
-.landing-glow-two {
-  top: 320px;
-  left: -210px;
-
-  width: 570px;
-  height: 570px;
-
-  background:
-    radial-gradient(
-      circle,
-      rgba(67, 211, 255, 0.055),
-      transparent 68%
-    );
-}
-
-.landing-hero-layout {
-  position: relative;
-  z-index: 2;
-
-  display: grid;
-  grid-template-columns:
-    minmax(0, 0.88fr)
-    minmax(520px, 1.12fr);
-
-  align-items: center;
-
-  gap: 72px;
-
-  padding-top: 105px;
-}
-
-.landing-hero-copy {
-  max-width: 580px;
-}
-
-.landing-eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 9px;
-
-  margin-bottom: 25px;
-
-  padding:
-    6px 11px 6px 7px;
-
-  border:
-    1px solid
-    rgba(96, 165, 250, 0.18);
-
-  border-radius: 999px;
-
-  color: #a6c5ff;
-
-  font-size: 10px;
-  font-weight: 800;
-
-  background:
-    rgba(67, 133, 255, 0.055);
-}
-
-.landing-eyebrow > span {
-  display: grid;
-
-  width: 25px;
-  height: 25px;
-
-  place-items: center;
-
-  border-radius: 999px;
-
-  color: #ffffff;
-
-  background:
-    rgba(67, 133, 255, 0.17);
-}
-
-.landing-hero-copy h1 {
-  margin:
-    0 0 25px;
-
-  font-family:
-    "Manrope",
-    "DM Sans",
-    sans-serif;
-
-  font-size:
-    clamp(
-      50px,
-      5.3vw,
-      75px
-    );
-
-  font-weight: 800;
-  line-height: 1;
-
-  letter-spacing:
-    -0.065em;
-}
-
-.landing-hero-copy h1 span {
-  color: #76a8ff;
-
-  background:
-    linear-gradient(
-      105deg,
-      #6b9fff,
-      #8cc8ff
-    );
-
-  background-clip: text;
-
-  -webkit-background-clip:
-    text;
-
-  -webkit-text-fill-color:
-    transparent;
-}
-
-.landing-hero-copy > p {
-  max-width: 550px;
-
-  margin:
-    0 0 32px;
-
-  color: #8d9eb6;
-
-  font-size: 16px;
-  line-height: 1.75;
-}
-
-.landing-hero-actions,
-.landing-final-actions {
-  display: flex;
-  align-items: center;
-  gap: 11px;
-
-  flex-wrap: wrap;
-}
-
-.landing-primary-button,
-.landing-secondary-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 9px;
-
-  box-sizing: border-box;
-
-  min-height: 49px;
-
-  padding:
-    0 19px;
-
-  border-radius: 12px;
-
-  font-size: 13px;
-  font-weight: 800;
-
-  text-decoration: none;
-
-  transition:
-    transform 160ms ease,
-    box-shadow 160ms ease,
-    border-color 160ms ease,
-    background 160ms ease;
-}
-
-.landing-primary-button {
-  color: #ffffff;
-
-  background:
-    linear-gradient(
-      135deg,
-      #4385ff,
-      #326be0
-    );
-
-  box-shadow:
-    0 14px 34px
-    rgba(67, 133, 255, 0.24);
-}
-
-.landing-primary-button:hover {
-  transform:
-    translateY(-2px);
-
-  box-shadow:
-    0 17px 40px
-    rgba(67, 133, 255, 0.34);
-}
-
-.landing-secondary-button {
-  border:
-    1px solid
-    rgba(148, 163, 184, 0.17);
-
-  color: #c0cad8;
-
-  background:
-    rgba(255, 255, 255, 0.028);
-}
-
-.landing-secondary-button:hover {
-  transform:
-    translateY(-2px);
-
-  border-color:
-    rgba(96, 165, 250, 0.28);
-
-  background:
-    rgba(255, 255, 255, 0.055);
-}
-
-.landing-trust-row {
-  display: flex;
-  align-items: center;
-  gap: 18px;
-
-  flex-wrap: wrap;
-
-  margin-top: 25px;
-}
-
-.landing-trust-row > div {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-
-  color: #72839b;
-
-  font-size: 10px;
-  font-weight: 700;
-}
-
-.landing-trust-row svg {
-  color: #48d2a0;
-}
-
-/* =========================================================
-   PRODUCT PREVIEW
-   ========================================================= */
-
-.landing-preview-wrap {
-  position: relative;
-
-  min-width: 0;
-
-  padding:
-    40px 0 65px;
-}
-
-.landing-preview-glow {
-  position: absolute;
-
-  top: 0;
-  left: 8%;
-
-  width: 85%;
-  height: 90%;
-
-  border-radius: 50%;
-
-  background:
-    radial-gradient(
-      circle,
-      rgba(67, 133, 255, 0.09),
-      transparent 67%
-    );
-
-  filter: blur(22px);
-}
-
-.landing-product-window {
-  position: relative;
-  z-index: 3;
-
-  overflow: hidden;
-
-  border:
-    1px solid
-    rgba(138, 175, 233, 0.16);
-
-  border-radius: 21px;
-
-  background:
-    linear-gradient(
-      145deg,
-      rgba(14, 22, 39, 0.98),
-      rgba(7, 13, 25, 0.99)
-    );
-
-  box-shadow:
-    0 42px 110px
-    rgba(0, 0, 0, 0.46),
-    0 0 80px
-    rgba(67, 133, 255, 0.04);
-
-  transform:
-    perspective(1400px)
-    rotateY(-4deg)
-    rotateX(2deg);
-}
-
-.landing-window-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  height: 53px;
-
-  padding:
-    0 17px;
-
-  border-bottom:
-    1px solid
-    rgba(148, 163, 184, 0.09);
-}
-
-.landing-window-brand {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-
-  font-size: 11px;
-  font-weight: 800;
-}
-
-.landing-window-brand > span {
-  display: grid;
-
-  width: 27px;
-  height: 27px;
-
-  place-items: center;
-
-  border-radius: 8px;
-
-  color: #9bc1ff;
-
-  background:
-    rgba(67, 133, 255, 0.1);
-}
-
-.landing-window-status {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-
-  color: #7d8fa7;
-
-  font-size: 8px;
-  font-weight: 800;
-}
-
-.landing-window-status > span {
-  width: 6px;
-  height: 6px;
-
-  border-radius: 50%;
-
-  background: #36d399;
-
-  box-shadow:
-    0 0 10px
-    rgba(54, 211, 153, 0.6);
-}
-
-.landing-window-body {
-  display: grid;
-  grid-template-columns:
-    55px 1fr;
-
-  min-height: 397px;
-}
-
-.landing-preview-sidebar {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-
-  padding-top: 17px;
-
-  border-right:
-    1px solid
-    rgba(148, 163, 184, 0.07);
-
-  background:
-    rgba(3, 8, 17, 0.44);
-}
-
-.landing-preview-sidebar > div {
-  display: grid;
-
-  width: 34px;
-  height: 34px;
-
-  place-items: center;
-
-  border-radius: 9px;
-
-  color: #5d6d85;
-}
-
-.landing-preview-sidebar > div.active {
-  color: #7baaff;
-
-  background:
-    rgba(67, 133, 255, 0.1);
-}
-
-.landing-preview-main {
-  min-width: 0;
-
-  padding: 20px;
-}
-
-.landing-preview-heading {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  gap: 15px;
-
-  margin-bottom: 17px;
-}
-
-.landing-preview-heading > div span,
-.landing-preview-heading > div strong {
-  display: block;
-}
-
-.landing-preview-heading > div span {
-  margin-bottom: 4px;
-
-  color: #64758d;
-
-  font-size: 8px;
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
-}
-
-.landing-preview-heading > div strong {
-  font-size: 15px;
-}
-
-.landing-preview-heading button {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-
-  min-height: 30px;
-
-  padding:
-    0 9px;
-
-  border: 0;
-  border-radius: 7px;
-
-  color: #ffffff;
-
-  font-size: 8px;
-  font-weight: 800;
-
-  background: #3e7beb;
-}
-
-.landing-preview-stats {
-  display: grid;
-  grid-template-columns:
-    repeat(3, 1fr);
-
-  gap: 8px;
-
-  margin-bottom: 16px;
-}
-
-.landing-preview-stats > div {
-  min-width: 0;
-
-  padding: 12px;
-
-  border:
-    1px solid
-    rgba(148, 163, 184, 0.08);
-
-  border-radius: 9px;
-
-  background:
-    rgba(255, 255, 255, 0.018);
-}
-
-.landing-preview-stats span,
-.landing-preview-stats strong,
-.landing-preview-stats small {
-  display: block;
-}
-
-.landing-preview-stats span {
-  margin-bottom: 6px;
-
-  color: #64758e;
-
-  font-size: 7px;
-}
-
-.landing-preview-stats strong {
-  margin-bottom: 4px;
-
-  font-size: 14px;
-}
-
-.landing-preview-stats strong.secure {
-  color: #68d8af;
-
-  font-size: 11px;
-}
-
-.landing-preview-stats small {
-  color: #586a82;
-
-  font-size: 7px;
-}
-
-.landing-preview-buckets {
-  display: grid;
-  gap: 8px;
-}
-
-.landing-preview-bucket {
-  display: grid;
-  grid-template-columns:
-    34px minmax(0, 1fr)
-    auto;
-
-  align-items: center;
-  gap: 9px;
-
-  padding: 11px;
-
-  border:
-    1px solid
-    rgba(148, 163, 184, 0.08);
-
-  border-radius: 10px;
-
-  background:
-    rgba(255, 255, 255, 0.016);
-}
-
-.landing-preview-bucket.default {
-  border-color:
-    rgba(67, 133, 255, 0.18);
-
-  background:
-    rgba(67, 133, 255, 0.035);
-}
-
-.landing-preview-bucket-icon {
-  display: grid;
-
-  width: 32px;
-  height: 32px;
-
-  place-items: center;
-
-  border-radius: 8px;
-
-  color: #78a7ff;
-
-  background:
-    rgba(67, 133, 255, 0.08);
-}
-
-.landing-preview-bucket-copy {
-  min-width: 0;
-}
-
-.landing-preview-bucket-copy strong,
-.landing-preview-bucket-copy span {
-  display: block;
-}
-
-.landing-preview-bucket-copy strong {
-  overflow: hidden;
-
-  color: #b9c6d7;
-
-  font-size: 9px;
-
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  filter: blur(15px);
 }
-
-.landing-preview-bucket-copy span {
-  margin-top: 3px;
-
-  color: #596b84;
-
-  font-size: 7px;
-}
-
-.landing-preview-badge {
-  padding:
-    4px 7px;
-
-  border-radius: 999px;
-
-  color: #78a8ff;
-
-  font-size: 6px;
-  font-weight: 800;
-  text-transform: uppercase;
-
-  background:
-    rgba(67, 133, 255, 0.07);
-}
-
-.landing-preview-badge.secondary {
-  color: #63d5af;
-
-  background:
-    rgba(54, 211, 153, 0.06);
-}
-
-.landing-floating-card {
-  position: absolute;
-  z-index: 7;
-
-  display: flex;
-  align-items: center;
-  gap: 9px;
-
-  padding:
-    11px 13px;
-
-  border:
-    1px solid
-    rgba(148, 163, 184, 0.12);
-
-  border-radius: 11px;
-
-  background:
-    rgba(9, 16, 29, 0.94);
-
-  box-shadow:
-    0 16px 38px
-    rgba(0, 0, 0, 0.33);
-
-  backdrop-filter:
-    blur(16px);
-}
-
-.landing-floating-card.secure {
-  right: -27px;
-  bottom: 20px;
-}
-
-.landing-floating-card.storage {
-  top: 7px;
-  left: -20px;
-}
-
-.landing-floating-card > span {
-  display: grid;
-
-  width: 31px;
-  height: 31px;
-
-  place-items: center;
-
-  border-radius: 8px;
-
-  color: #79a8ff;
-
-  background:
-    rgba(67, 133, 255, 0.09);
-}
-
-.landing-floating-card div {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-
-.landing-floating-card strong {
-  font-size: 9px;
-}
-
-.landing-floating-card small {
-  color: #62738c;
-
-  font-size: 7px;
-}
-
-/* =========================================================
-   TECHNOLOGY STRIP
-   ========================================================= */
-
-.landing-tech-strip {
-  position: relative;
-  z-index: 3;
-
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  gap: 30px;
-
-  margin-top: 55px;
-
-  padding:
-    21px 0;
-
-  border-top:
-    1px solid
-    rgba(148, 163, 184, 0.07);
-
-  border-bottom:
-    1px solid
-    rgba(148, 163, 184, 0.07);
-}
-
-.landing-tech-strip > span {
-  color: #586a82;
-
-  font-size: 9px;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-}
-
-.landing-tech-strip > div {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-
-  gap: 23px;
-
-  flex-wrap: wrap;
-}
-
-.landing-tech-strip strong {
-  color: #7d8da4;
-
-  font-size: 10px;
-  font-weight: 800;
-}
-
-/* =========================================================
-   GENERIC SECTIONS
-   ========================================================= */
-
-.landing-section {
-  position: relative;
-
-  padding:
-    115px 0;
-}
-
-.landing-section-heading {
-  max-width: 720px;
-
-  margin-bottom: 48px;
-}
-
-.landing-section-heading.centered {
-  margin-right: auto;
-  margin-left: auto;
-
-  text-align: center;
-}
-
-.landing-section-heading > span,
-.landing-small-label {
-  display: block;
-
-  margin-bottom: 13px;
-
-  color: #6e9bf0;
-
-  font-size: 9px;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.11em;
-}
-
-.landing-section-heading h2,
-.landing-aws-copy h2,
-.landing-security-copy h2,
-.landing-final-card h2 {
-  margin:
-    0 0 18px;
-
-  font-family:
-    "Manrope",
-    "DM Sans",
-    sans-serif;
-
-  font-size:
-    clamp(
-      34px,
-      4vw,
-      50px
-    );
-
-  font-weight: 800;
-  line-height: 1.13;
-
-  letter-spacing:
-    -0.05em;
-}
-
-.landing-section-heading p,
-.landing-aws-copy > p,
-.landing-security-copy > p,
-.landing-final-card > p {
-  margin: 0;
-
-  color: #8293aa;
-
-  font-size: 14px;
-  line-height: 1.75;
-}
-
-/* =========================================================
-   FEATURES
-   ========================================================= */
-
-.landing-features {
-  background:
-    linear-gradient(
-      180deg,
-      #050914,
-      #070c17 50%,
-      #050914
-    );
-}
-
-.landing-feature-grid {
-  display: grid;
-  grid-template-columns:
-    repeat(3, minmax(0, 1fr));
-
-  gap: 14px;
-}
-
-.landing-feature-card {
-  min-height: 235px;
-
-  padding: 24px;
-
-  border:
-    1px solid
-    rgba(148, 163, 184, 0.1);
-
-  border-radius: 17px;
-
-  background:
-    linear-gradient(
-      145deg,
-      rgba(15, 23, 40, 0.72),
-      rgba(9, 16, 29, 0.68)
-    );
-
-  transition:
-    transform 180ms ease,
-    border-color 180ms ease,
-    background 180ms ease;
-}
-
-.landing-feature-card:hover {
-  transform:
-    translateY(-3px);
-
-  border-color:
-    rgba(96, 165, 250, 0.21);
-
-  background:
-    linear-gradient(
-      145deg,
-      rgba(18, 29, 50, 0.82),
-      rgba(10, 17, 30, 0.72)
-    );
-}
-
-.landing-feature-icon {
-  display: grid;
-
-  width: 44px;
-  height: 44px;
-
-  margin-bottom: 23px;
-
-  place-items: center;
-
-  border:
-    1px solid
-    rgba(96, 165, 250, 0.13);
-
-  border-radius: 11px;
-
-  color: #77a7ff;
-
-  background:
-    rgba(67, 133, 255, 0.07);
-}
-
-.landing-feature-card h3 {
-  margin:
-    0 0 10px;
-
-  font-family:
-    "Manrope",
-    sans-serif;
-
-  font-size: 16px;
-  font-weight: 800;
-
-  letter-spacing:
-    -0.025em;
-}
-
-.landing-feature-card p {
-  margin: 0;
-
-  color: #7487a0;
-
-  font-size: 12px;
-  line-height: 1.68;
-}
-
-/* =========================================================
-   AWS STORAGE SECTION
-   ========================================================= */
-
-.landing-aws-section {
-  border-top:
-    1px solid
-    rgba(148, 163, 184, 0.06);
-
-  border-bottom:
-    1px solid
-    rgba(148, 163, 184, 0.06);
-
-  background:
-    #060b15;
-}
-
-.landing-aws-layout {
-  display: grid;
-  grid-template-columns:
-    minmax(0, 0.95fr)
-    minmax(460px, 1.05fr);
-
-  gap: 90px;
-
-  align-items: center;
-}
-
-.landing-aws-copy {
-  max-width: 550px;
-}
-
-.landing-aws-points {
-  display: grid;
-  grid-template-columns:
-    1fr 1fr;
-
-  gap: 11px;
-
-  margin-top: 27px;
-}
-
-.landing-aws-points > div {
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-
-  color: #91a2b8;
-
-  font-size: 11px;
-  line-height: 1.5;
-}
-
-.landing-aws-points svg {
-  flex-shrink: 0;
-
-  margin-top: 1px;
-
-  color: #4ed2a2;
-}
-
-.landing-inline-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-
-  margin-top: 28px;
-
-  color: #7faaff;
-
-  font-size: 12px;
-  font-weight: 800;
-
-  text-decoration: none;
-}
-
-.landing-aws-visual {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  min-height: 430px;
-}
-
-.landing-storage-tree {
-  position: relative;
-
-  width:
-    min(
-      100%,
-      530px
-    );
-}
-
-.landing-tree-root {
-  position: relative;
-  z-index: 2;
-
-  display: flex;
-  align-items: center;
-  gap: 13px;
-
-  width:
-    min(
-      100%,
-      260px
-    );
-
-  margin-inline: auto;
-
-  padding: 18px;
-
-  border:
-    1px solid
-    rgba(96, 165, 250, 0.22);
-
-  border-radius: 15px;
-
-  color: #7faaff;
-
-  background:
-    linear-gradient(
-      145deg,
-      rgba(25, 41, 70, 0.96),
-      rgba(10, 18, 33, 0.98)
-    );
-
-  box-shadow:
-    0 23px 60px
-    rgba(0, 0, 0, 0.28),
-    0 0 50px
-    rgba(67, 133, 255, 0.06);
-}
-
-.landing-tree-root div {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-
-.landing-tree-root span {
-  color: #687a93;
-
-  font-size: 8px;
-  text-transform: uppercase;
-}
-
-.landing-tree-root strong {
-  color: #d8e3f1;
-
-  font-size: 13px;
-}
-
-.landing-tree-line {
-  width: 1px;
-  height: 60px;
-
-  margin-inline: auto;
-
-  background:
-    linear-gradient(
-      to bottom,
-      rgba(96, 165, 250, 0.32),
-      rgba(96, 165, 250, 0.1)
-    );
-}
-
-.landing-tree-branches {
-  display: grid;
-  grid-template-columns:
-    repeat(2, 1fr);
-
-  gap: 15px;
-}
-
-.landing-tree-branches article {
-  padding: 21px;
-
-  border:
-    1px solid
-    rgba(148, 163, 184, 0.1);
-
-  border-radius: 15px;
-
-  background:
-    rgba(13, 21, 37, 0.75);
-}
-
-.landing-tree-icon {
-  display: grid;
-
-  width: 40px;
-  height: 40px;
-
-  margin-bottom: 18px;
-
-  place-items: center;
-
-  border-radius: 10px;
-}
-
-.landing-tree-icon.managed {
-  color: #62d6dc;
-
-  background:
-    rgba(61, 217, 222, 0.07);
-}
-
-.landing-tree-icon.aws {
-  color: #7aa9ff;
-
-  background:
-    rgba(67, 133, 255, 0.08);
-}
-
-.landing-tree-branches span,
-.landing-tree-branches strong,
-.landing-tree-branches small {
-  display: block;
-}
-
-.landing-tree-branches span {
-  margin-bottom: 5px;
-
-  color: #62748c;
-
-  font-size: 8px;
-  text-transform: uppercase;
-}
-
-.landing-tree-branches strong {
-  color: #bcc9da;
-
-  font-size: 12px;
-}
-
-.landing-tree-branches small {
-  margin-top: 5px;
-
-  color: #586b83;
-
-  font-size: 8px;
-}
-
-/* =========================================================
-   SECURITY
-   ========================================================= */
-
-.landing-security {
-  background:
-    radial-gradient(
-      circle at 25% 50%,
-      rgba(67, 133, 255, 0.055),
-      transparent 30%
-    ),
-    #050914;
-}
-
-.landing-security-layout {
-  display: grid;
-  grid-template-columns:
-    1fr 1fr;
-
-  gap: 90px;
-
-  align-items: center;
-}
-
-.landing-security-visual {
-  position: relative;
-
-  min-height: 440px;
-}
-
-.landing-security-ring {
-  position: absolute;
-
-  top: 50%;
-  left: 50%;
-
-  border:
-    1px solid
-    rgba(93, 146, 235, 0.13);
-
-  border-radius: 50%;
 
-  transform:
-    translate(-50%, -50%);
+.azure-hero-glow.one {
+  width: 430px;
+  height: 430px;
+  right: 6%;
+  top: -170px;
+  background: rgba(223,120,76,.2);
 }
 
-.landing-security-ring.ring-one {
+.azure-hero-glow.two {
   width: 360px;
   height: 360px;
+  left: -160px;
+  bottom: -180px;
+  background: rgba(196,81,45,.15);
 }
 
-.landing-security-ring.ring-two {
-  width: 260px;
-  height: 260px;
-
-  border-color:
-    rgba(93, 146, 235, 0.18);
-}
-
-.landing-security-ring.ring-three {
-  width: 165px;
-  height: 165px;
-
-  border-color:
-    rgba(93, 146, 235, 0.24);
-
-  box-shadow:
-    0 0 60px
-    rgba(67, 133, 255, 0.06);
-}
-
-.landing-security-core {
-  position: absolute;
-
-  top: 50%;
-  left: 50%;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-
-  width: 116px;
-  height: 116px;
-
-  border:
-    1px solid
-    rgba(96, 165, 250, 0.24);
-
-  border-radius: 28px;
-
-  color: #7faaff;
-
-  background:
-    linear-gradient(
-      145deg,
-      rgba(24, 42, 73, 0.96),
-      rgba(10, 18, 33, 0.98)
-    );
-
-  box-shadow:
-    0 22px 55px
-    rgba(0, 0, 0, 0.35);
-
-  transform:
-    translate(-50%, -50%);
-}
-
-.landing-security-core strong {
-  margin-top: 8px;
-
-  color: #ffffff;
-
-  font-size: 10px;
-}
-
-.landing-security-core span {
-  margin-top: 2px;
-
-  color: #657792;
-
-  font-size: 7px;
-}
-
-.landing-security-chip {
-  position: absolute;
-
-  display: flex;
-  align-items: center;
-  gap: 8px;
-
-  padding:
-    10px 13px;
-
-  border:
-    1px solid
-    rgba(148, 163, 184, 0.11);
-
-  border-radius: 10px;
-
-  color: #8fa0b7;
-
-  font-size: 9px;
-  font-weight: 800;
-
-  background:
-    rgba(10, 17, 31, 0.9);
-
-  box-shadow:
-    0 14px 34px
-    rgba(0, 0, 0, 0.28);
-}
-
-.landing-security-chip svg {
-  color: #78a7ff;
-}
-
-.landing-security-chip.chip-one {
-  top: 25%;
-  left: 4%;
-}
-
-.landing-security-chip.chip-two {
-  right: 2%;
-  bottom: 26%;
-}
-
-.landing-security-copy {
-  max-width: 550px;
-}
-
-.landing-security-list {
+.azure-hero-layout {
+  position: relative;
+  z-index: 2;
+  padding: 75px 0;
   display: grid;
   grid-template-columns:
-    1fr 1fr;
-
-  gap: 11px;
-
-  margin-top: 27px;
-}
-
-.landing-security-list > div {
-  display: flex;
+    minmax(0,1.05fr)
+    minmax(420px,.75fr);
+  gap: 72px;
   align-items: center;
-  gap: 9px;
-
-  color: #94a5ba;
-
-  font-size: 11px;
-  font-weight: 700;
 }
 
-.landing-security-list > div > span {
-  display: grid;
-
-  width: 24px;
-  height: 24px;
-
-  flex-shrink: 0;
-
-  place-items: center;
-
-  border-radius: 7px;
-
-  color: #51d4a3;
-
-  background:
-    rgba(54, 211, 153, 0.07);
-}
-
-/* =========================================================
-   ARCHITECTURE
-   ========================================================= */
-
-.landing-architecture {
-  border-top:
-    1px solid
-    rgba(148, 163, 184, 0.06);
-
-  background:
-    linear-gradient(
-      180deg,
-      #060b15,
-      #050914
-    );
-}
-
-.landing-architecture-flow {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  gap: 13px;
-
-  margin-top: 55px;
-}
-
-.landing-architecture-flow > article {
-  width: 122px;
-
-  padding:
-    17px 13px;
-
-  border:
-    1px solid
-    rgba(148, 163, 184, 0.09);
-
-  border-radius: 14px;
-
-  text-align: center;
-
-  background:
-    rgba(13, 21, 37, 0.72);
-}
-
-.landing-architecture-flow > article.featured {
-  border-color:
-    rgba(96, 165, 250, 0.23);
-
-  box-shadow:
-    0 0 35px
-    rgba(67, 133, 255, 0.055);
-}
-
-.landing-architecture-flow > article > div {
-  display: grid;
-
-  width: 36px;
-  height: 36px;
-
-  margin:
-    0 auto 11px;
-
-  place-items: center;
-
-  border-radius: 9px;
-
-  color: #78a7ff;
-
-  background:
-    rgba(67, 133, 255, 0.07);
-}
-
-.landing-architecture-flow span,
-.landing-architecture-flow strong {
-  display: block;
-}
-
-.landing-architecture-flow span {
-  margin-bottom: 3px;
-
-  color: #5d6f88;
-
-  font-size: 7px;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-}
-
-.landing-architecture-flow strong {
-  font-size: 10px;
-}
-
-.landing-flow-arrow {
-  flex-shrink: 0;
-
-  color: #44546b;
-}
-
-.landing-flow-services {
-  display: grid;
-  gap: 6px;
-
-  min-width: 130px;
-}
-
-.landing-flow-services > div {
+.azure-hero-kicker {
+  width: fit-content;
   display: flex;
   align-items: center;
   gap: 7px;
-
-  padding:
-    8px 10px;
-
-  border:
-    1px solid
-    rgba(148, 163, 184, 0.08);
-
-  border-radius: 8px;
-
-  color: #8091a8;
-
-  font-size: 8px;
+  color: #ec9873;
+  font-size: 9px;
   font-weight: 800;
+  letter-spacing: .14em;
+}
 
+.azure-hero-copy h1 {
+  max-width: 700px;
+  margin: 20px 0 0;
+  font-size: clamp(47px, 5vw, 72px);
+  line-height: 1.01;
+  letter-spacing: -3px;
+}
+
+.azure-hero-copy h1 span {
+  color: #e68157;
+}
+
+.azure-hero-copy > p {
+  max-width: 600px;
+  margin: 24px 0 0;
+  color: rgba(255,255,255,.61);
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+.azure-hero-actions {
+  margin-top: 31px;
+  display: flex;
+  gap: 11px;
+  align-items: center;
+}
+
+.azure-primary-button,
+.azure-secondary-button {
+  min-height: 44px;
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 11px;
+  font-size: 11px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.azure-primary-button {
   background:
-    rgba(255, 255, 255, 0.015);
+    linear-gradient(
+      135deg,
+      var(--az-rust),
+      var(--az-rust-dark)
+    );
+  color: white;
+  box-shadow:
+    0 14px 30px rgba(196,81,45,.22);
 }
 
-.landing-flow-services svg {
-  color: #6d9df5;
+.azure-secondary-button {
+  border: 1px solid rgba(255,255,255,.14);
+  background: rgba(255,255,255,.06);
+  color: rgba(255,255,255,.78);
 }
 
-.landing-architecture-grid {
-  display: grid;
-  grid-template-columns:
-    repeat(6, 1fr);
-
-  gap: 9px;
-
-  margin-top: 38px;
+.azure-trust-row {
+  margin-top: 27px;
+  display: flex;
+  gap: 19px;
+  flex-wrap: wrap;
 }
 
-.landing-architecture-grid > div {
-  padding: 13px;
-
-  border:
-    1px solid
-    rgba(148, 163, 184, 0.07);
-
-  border-radius: 10px;
-
-  background:
-    rgba(255, 255, 255, 0.015);
-}
-
-.landing-architecture-grid span,
-.landing-architecture-grid strong {
-  display: block;
-}
-
-.landing-architecture-grid span {
-  color: #5f7088;
-
-  font-size: 7px;
-}
-
-.landing-architecture-grid strong {
-  margin-top: 3px;
-
-  color: #a5b4c7;
-
+.azure-trust-row span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: rgba(255,255,255,.47);
   font-size: 9px;
 }
 
-/* =========================================================
-   FINAL CTA
-   ========================================================= */
-
-.landing-final {
-  padding:
-    50px 0 110px;
-
-  background: #050914;
+.azure-trust-row svg {
+  color: #e98b63;
 }
 
-.landing-final-card {
-  position: relative;
+/* Hero platform */
 
+.azure-hero-platform {
   overflow: hidden;
+  border: 1px solid rgba(255,255,255,.11);
+  border-radius: 25px;
+  background: rgba(255,255,255,.07);
+  backdrop-filter: blur(16px);
+  box-shadow:
+    0 30px 70px rgba(0,0,0,.18);
+}
 
-  max-width: 1020px;
+.azure-platform-header {
+  padding: 17px 19px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255,255,255,.09);
+}
 
-  margin-inline: auto;
+.azure-platform-header > div:first-child {
+  display: flex;
+  flex-direction: column;
+}
 
-  padding:
-    64px 40px;
+.azure-platform-header span {
+  color: rgba(255,255,255,.4);
+  font-size: 7px;
+  letter-spacing: .12em;
+}
 
-  border:
-    1px solid
-    rgba(96, 165, 250, 0.14);
+.azure-platform-header strong {
+  margin-top: 3px;
+  font-size: 11px;
+}
 
-  border-radius: 24px;
+.azure-platform-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #a8c4af;
+  font-size: 8px;
+}
 
+.azure-platform-status > span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #77a483;
+}
+
+.azure-platform-flow {
+  padding: 27px 28px;
+}
+
+.azure-flow-node {
+  width: 190px;
+  margin: 0 auto;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 13px;
+  background: rgba(255,255,255,.06);
+}
+
+.azure-flow-node > div {
+  width: 35px;
+  height: 35px;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  background: rgba(230,129,87,.15);
+  color: #e98b63;
+}
+
+.azure-flow-node span,
+.azure-flow-node small {
+  display: block;
+}
+
+.azure-flow-node span {
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.azure-flow-node small {
+  margin-top: 2px;
+  color: rgba(255,255,255,.38);
+  font-size: 7px;
+}
+
+.azure-flow-connector {
+  height: 24px;
+  display: grid;
+  place-items: center;
+}
+
+.azure-flow-connector span {
+  width: 1px;
+  height: 100%;
+  background: rgba(255,255,255,.15);
+}
+
+.azure-flow-branches {
+  width: 205px;
+  height: 30px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.azure-flow-branches > span {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 1px;
+  height: 15px;
+  background: rgba(255,255,255,.15);
+}
+
+.azure-flow-branches > div {
+  position: absolute;
+  top: 14px;
+  width: 50%;
+  height: 16px;
+  border-top: 1px solid rgba(255,255,255,.15);
+}
+
+.azure-flow-branches > div:first-child {
+  left: 0;
+  border-left: 1px solid rgba(255,255,255,.15);
+}
+
+.azure-flow-branches > div:last-child {
+  right: 0;
+  border-right: 1px solid rgba(255,255,255,.15);
+}
+
+.azure-flow-destinations {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 11px;
+}
+
+.azure-flow-destinations > div {
+  padding: 13px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  border: 1px solid rgba(255,255,255,.09);
+  border-radius: 13px;
+  background: rgba(255,255,255,.05);
+}
+
+.azure-flow-destinations .icon {
+  width: 33px;
+  height: 33px;
+  display: grid;
+  place-items: center;
+  border-radius: 9px;
+}
+
+.azure-flow-destinations .blob {
+  background: var(--az-rust);
+}
+
+.azure-flow-destinations .database {
+  background: #e2c0ae;
+  color: var(--az-aubergine);
+}
+
+.azure-flow-destinations strong {
+  margin-top: 10px;
+  font-size: 9px;
+}
+
+.azure-flow-destinations small {
+  margin-top: 3px;
+  color: rgba(255,255,255,.37);
+  font-size: 7px;
+}
+
+.azure-platform-footer {
+  padding: 13px 18px;
+  display: flex;
+  gap: 16px;
+  border-top: 1px solid rgba(255,255,255,.09);
+}
+
+.azure-platform-footer span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: rgba(255,255,255,.42);
+  font-size: 8px;
+}
+
+.azure-platform-footer svg {
+  color: #e98b63;
+}
+
+/* Proof */
+
+.azure-proof-strip {
+  border-bottom: 1px solid var(--az-border);
+  background: var(--az-paper);
+}
+
+.azure-proof-grid {
+  min-height: 96px;
+  display: grid;
+  grid-template-columns: repeat(5,1fr);
+  align-items: center;
+}
+
+.azure-proof-grid > div {
+  padding: 0 20px;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--az-border);
+}
+
+.azure-proof-grid > div:first-child {
+  padding-left: 0;
+}
+
+.azure-proof-grid > div:last-child {
+  border-right: 0;
+}
+
+.azure-proof-grid strong {
+  font-size: 12px;
+}
+
+.azure-proof-grid span {
+  margin-top: 3px;
+  color: var(--az-muted);
+  font-size: 8px;
+}
+
+/* General sections */
+
+.azure-section {
+  padding: 100px 0;
+}
+
+.azure-section-heading {
+  max-width: 650px;
+}
+
+.azure-section-heading.centered {
+  margin: 0 auto;
   text-align: center;
+}
 
+.azure-section-heading > span,
+.azure-workflow-copy > span,
+.azure-security-copy > span {
+  color: var(--az-rust);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: .13em;
+}
+
+.azure-section-heading h2,
+.azure-workflow-copy h2,
+.azure-security-copy h2 {
+  margin: 10px 0 0;
+  font-size: clamp(32px,4vw,46px);
+  line-height: 1.08;
+  letter-spacing: -1.6px;
+}
+
+.azure-section-heading p,
+.azure-workflow-copy > p,
+.azure-security-copy > p {
+  margin: 15px 0 0;
+  color: var(--az-muted);
+  font-size: 12px;
+  line-height: 1.75;
+}
+
+/* Features */
+
+.azure-feature-grid {
+  margin-top: 48px;
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 15px;
+}
+
+.azure-feature-grid article {
+  padding: 25px;
+  border: 1px solid var(--az-border);
+  border-radius: 18px;
+  background: var(--az-paper);
+  transition:
+    transform .16s ease,
+    box-shadow .16s ease;
+}
+
+.azure-feature-grid article:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    0 18px 40px rgba(53,28,24,.07);
+}
+
+.azure-feature-grid article > div {
+  width: 43px;
+  height: 43px;
+  display: grid;
+  place-items: center;
+  border-radius: 13px;
+  background: #f1e1da;
+  color: var(--az-rust);
+}
+
+.azure-feature-grid h3 {
+  margin: 18px 0 0;
+  font-size: 14px;
+}
+
+.azure-feature-grid p {
+  margin: 8px 0 0;
+  color: var(--az-muted);
+  font-size: 10px;
+  line-height: 1.7;
+}
+
+/* Workflow */
+
+.azure-workflow-section {
+  background: var(--az-paper);
+}
+
+.azure-workflow-layout {
+  display: grid;
+  grid-template-columns:
+    minmax(0,1fr)
+    minmax(400px,.75fr);
+  gap: 90px;
+  align-items: center;
+}
+
+.azure-workflow-points {
+  margin-top: 31px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.azure-workflow-points > div {
+  display: flex;
+  gap: 13px;
+}
+
+.azure-workflow-points > div > span {
+  width: 33px;
+  height: 33px;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  background: var(--az-aubergine);
+  color: #e98b63;
+  font-size: 8px;
+  font-weight: 800;
+}
+
+.azure-workflow-points strong {
+  font-size: 11px;
+}
+
+.azure-workflow-points p {
+  margin: 4px 0 0;
+  color: var(--az-muted);
+  font-size: 9px;
+  line-height: 1.5;
+}
+
+.azure-workflow-card {
+  padding: 25px;
+  border-radius: 24px;
   background:
     linear-gradient(
       145deg,
-      rgba(15, 26, 46, 0.92),
-      rgba(8, 15, 28, 0.96)
+      #301815,
+      #49231d
     );
-
+  color: white;
   box-shadow:
-    0 32px 85px
-    rgba(0, 0, 0, 0.29);
+    0 25px 60px rgba(53,28,24,.16);
 }
 
-.landing-final-glow {
-  position: absolute;
-
-  top: -230px;
-  left: 50%;
-
-  width: 650px;
-  height: 430px;
-
-  border-radius: 50%;
-
-  background:
-    radial-gradient(
-      circle,
-      rgba(67, 133, 255, 0.16),
-      transparent 65%
-    );
-
-  transform:
-    translateX(-50%);
-
-  pointer-events: none;
-}
-
-.landing-final-icon {
-  position: relative;
-
-  display: grid;
-
-  width: 47px;
-  height: 47px;
-
-  margin:
-    0 auto 21px;
-
-  place-items: center;
-
-  border:
-    1px solid
-    rgba(96, 165, 250, 0.23);
-
-  border-radius: 13px;
-
-  color: #82aeff;
-
-  background:
-    rgba(67, 133, 255, 0.09);
-}
-
-.landing-final-card h2 {
-  position: relative;
-
-  max-width: 650px;
-
-  margin-right: auto;
-  margin-left: auto;
-}
-
-.landing-final-card > p {
-  position: relative;
-
-  max-width: 590px;
-
-  margin:
-    0 auto 28px;
-}
-
-.landing-final-actions {
-  position: relative;
-
-  justify-content: center;
-}
-
-/* =========================================================
-   FOOTER
-   ========================================================= */
-
-.landing-footer {
-  border-top:
-    1px solid
-    rgba(148, 163, 184, 0.07);
-
-  background: #040710;
-}
-
-.landing-footer-content {
-  display: grid;
-  grid-template-columns:
-    1fr auto;
-
-  gap: 30px;
-
-  padding:
-    40px 0;
-}
-
-.landing-footer-content > div:first-child p {
-  max-width: 350px;
-
-  margin:
-    14px 0 0;
-
-  color: #61728a;
-
-  font-size: 10px;
-}
-
-.landing-footer-links {
+.azure-workflow-card-header {
   display: flex;
+  gap: 10px;
   align-items: center;
-  gap: 22px;
+}
 
-  color: #78899f;
+.azure-workflow-card-header > div {
+  width: 39px;
+  height: 39px;
+  display: grid;
+  place-items: center;
+  border-radius: 11px;
+  background: var(--az-rust);
+}
 
+.azure-workflow-card-header > span {
+  display: flex;
+  flex-direction: column;
   font-size: 10px;
   font-weight: 700;
 }
 
-.landing-footer-links a {
-  color: inherit;
-
-  text-decoration: none;
+.azure-workflow-card-header small {
+  margin-top: 3px;
+  color: rgba(255,255,255,.39);
+  font-size: 7px;
 }
 
-.landing-footer-links a:hover {
-  color: #c1ccda;
-}
-
-.landing-footer-bottom {
-  grid-column:
-    1 / -1;
-
+.azure-lifecycle {
+  margin-top: 30px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+}
 
-  gap: 20px;
+.azure-lifecycle > div {
+  min-width: 64px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  color: #e98b63;
+}
 
-  padding-top: 24px;
-
-  border-top:
-    1px solid
-    rgba(148, 163, 184, 0.055);
-
-  color: #4e5e74;
-
+.azure-lifecycle span {
+  color: rgba(255,255,255,.7);
   font-size: 8px;
 }
 
-/* =========================================================
-   TABLET
-   ========================================================= */
-
-@media (
-  max-width: 1100px
-) {
-  .landing-nav-links {
-    gap: 20px;
-  }
-
-  .landing-hero-layout {
-    grid-template-columns:
-      1fr;
-
-    gap: 46px;
-  }
-
-  .landing-hero-copy {
-    max-width: 730px;
-
-    margin-inline: auto;
-
-    text-align: center;
-  }
-
-  .landing-eyebrow {
-    margin-right: auto;
-    margin-left: auto;
-  }
-
-  .landing-hero-copy > p {
-    margin-right: auto;
-    margin-left: auto;
-  }
-
-  .landing-hero-actions,
-  .landing-trust-row {
-    justify-content: center;
-  }
-
-  .landing-preview-wrap {
-    width:
-      min(
-        720px,
-        100%
-      );
-
-    margin-inline: auto;
-  }
-
-  .landing-tech-strip {
-    flex-direction: column;
-
-    text-align: center;
-  }
-
-  .landing-tech-strip > div {
-    justify-content: center;
-  }
-
-  .landing-feature-grid {
-    grid-template-columns:
-      repeat(2, minmax(0, 1fr));
-  }
-
-  .landing-aws-layout,
-  .landing-security-layout {
-    gap: 55px;
-  }
-
-  .landing-architecture-grid {
-    grid-template-columns:
-      repeat(3, 1fr);
-  }
+.azure-lifecycle i {
+  height: 1px;
+  flex: 1;
+  background: rgba(255,255,255,.13);
 }
 
-/* =========================================================
-   MOBILE NAV + LAYOUT
-   ========================================================= */
+.azure-workflow-storage {
+  margin-top: 28px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
 
-@media (
-  max-width: 860px
-) {
-  .landing-nav-links,
-  .landing-nav-actions {
+.azure-workflow-storage > div {
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  border: 1px solid rgba(255,255,255,.09);
+  border-radius: 11px;
+  background: rgba(255,255,255,.05);
+  color: #e98b63;
+}
+
+.azure-workflow-storage span {
+  display: flex;
+  flex-direction: column;
+  color: rgba(255,255,255,.4);
+  font-size: 7px;
+}
+
+.azure-workflow-storage strong {
+  margin-bottom: 2px;
+  color: white;
+  font-size: 9px;
+}
+
+/* Security */
+
+.azure-security-section {
+  background: #f0e6df;
+}
+
+.azure-security-layout {
+  display: grid;
+  grid-template-columns:
+    minmax(360px,.7fr)
+    minmax(0,1fr);
+  gap: 90px;
+  align-items: center;
+}
+
+.azure-security-card {
+  position: relative;
+  min-height: 370px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 25px;
+  background:
+    linear-gradient(
+      145deg,
+      #2d1714,
+      #4b251e
+    );
+  color: white;
+}
+
+.azure-security-shield {
+  position: relative;
+  z-index: 2;
+  width: 85px;
+  height: 85px;
+  display: grid;
+  place-items: center;
+  border-radius: 26px;
+  background: rgba(255,255,255,.07);
+  color: #e98b63;
+  box-shadow:
+    0 20px 50px rgba(0,0,0,.2);
+}
+
+.azure-security-card > strong {
+  position: relative;
+  z-index: 2;
+  margin-top: 18px;
+  font-size: 15px;
+}
+
+.azure-security-card > span {
+  position: relative;
+  z-index: 2;
+  margin-top: 4px;
+  color: rgba(255,255,255,.42);
+  font-size: 8px;
+}
+
+.azure-security-rings {
+  position: absolute;
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 50%;
+}
+
+.azure-security-rings.one {
+  width: 220px;
+  height: 220px;
+}
+
+.azure-security-rings.two {
+  width: 330px;
+  height: 330px;
+}
+
+.azure-security-list {
+  margin-top: 29px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 11px;
+}
+
+.azure-security-list > div {
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid #decfc7;
+  border-radius: 11px;
+  background: rgba(255,255,255,.45);
+  color: #665149;
+  font-size: 9px;
+  font-weight: 650;
+}
+
+.azure-security-list svg {
+  color: var(--az-green);
+}
+
+/* Architecture */
+
+.azure-architecture-section {
+  background: var(--az-paper);
+}
+
+.azure-architecture-grid {
+  margin-top: 42px;
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 12px;
+}
+
+.azure-architecture-grid article {
+  padding: 19px;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--az-border);
+  border-radius: 14px;
+  background: #fdf9f6;
+}
+
+.azure-architecture-grid span {
+  color: var(--az-muted);
+  font-size: 8px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+}
+
+.azure-architecture-grid strong {
+  margin-top: 7px;
+  font-size: 12px;
+}
+
+.azure-deployment-note {
+  margin-top: 15px;
+  padding: 18px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  border-radius: 14px;
+  background: var(--az-aubergine);
+  color: #e98b63;
+}
+
+.azure-deployment-note > div {
+  display: flex;
+  flex-direction: column;
+}
+
+.azure-deployment-note strong {
+  color: white;
+  font-size: 10px;
+}
+
+.azure-deployment-note p {
+  margin: 5px 0 0;
+  color: rgba(255,255,255,.48);
+  font-size: 9px;
+  line-height: 1.5;
+}
+
+/* CTA */
+
+.azure-final-cta {
+  position: relative;
+  overflow: hidden;
+  padding: 80px 0;
+  background:
+    linear-gradient(
+      125deg,
+      #2a1512,
+      #4b251e
+    );
+  color: white;
+}
+
+.azure-final-glow {
+  position: absolute;
+  width: 420px;
+  height: 420px;
+  right: -120px;
+  top: -230px;
+  border-radius: 50%;
+  background: rgba(223,120,76,.2);
+}
+
+.azure-final-layout {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 50px;
+}
+
+.azure-final-layout > div:first-child > span {
+  color: #e98b63;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: .13em;
+}
+
+.azure-final-layout h2 {
+  max-width: 620px;
+  margin: 9px 0 0;
+  font-size: 38px;
+  line-height: 1.08;
+  letter-spacing: -1.4px;
+}
+
+.azure-final-layout p {
+  max-width: 590px;
+  margin: 12px 0 0;
+  color: rgba(255,255,255,.5);
+  font-size: 11px;
+}
+
+.azure-final-layout > div:last-child {
+  display: flex;
+  gap: 9px;
+}
+
+.azure-final-layout a {
+  min-height: 42px;
+  padding: 0 15px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  border-radius: 10px;
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.azure-final-layout a:first-child {
+  background: var(--az-rust);
+}
+
+.azure-final-layout a:last-child {
+  border: 1px solid rgba(255,255,255,.13);
+  background: rgba(255,255,255,.06);
+}
+
+/* Footer */
+
+.azure-landing-footer {
+  background: #21110f;
+  color: white;
+}
+
+.azure-footer-layout {
+  min-height: 78px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 30px;
+}
+
+.azure-footer-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.azure-footer-brand > span {
+  color: #e98b63;
+}
+
+.azure-footer-layout nav {
+  display: flex;
+  gap: 19px;
+}
+
+.azure-footer-layout nav a {
+  color: rgba(255,255,255,.4);
+  font-size: 8px;
+  text-decoration: none;
+}
+
+.azure-footer-layout > span {
+  color: rgba(255,255,255,.3);
+  font-size: 8px;
+}
+
+/* Responsive */
+
+@media (max-width: 1000px) {
+  .azure-desktop-nav {
     display: none;
   }
 
-  .landing-mobile-toggle {
+  .azure-hero-layout,
+  .azure-workflow-layout,
+  .azure-security-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .azure-hero-platform {
+    max-width: 520px;
+  }
+
+  .azure-feature-grid {
+    grid-template-columns: repeat(2,1fr);
+  }
+
+  .azure-security-card {
+    max-width: 540px;
+  }
+}
+
+@media (max-width: 720px) {
+  .azure-landing-container {
+    width: min(100% - 32px, 620px);
+  }
+
+  .azure-nav {
+    min-height: 68px;
+  }
+
+  .azure-nav-login,
+  .azure-nav-register {
+    display: none;
+  }
+
+  .azure-mobile-toggle {
+    width: 38px;
+    height: 38px;
+    border: 1px solid var(--az-border);
+    display: grid;
+    place-items: center;
+    border-radius: 10px;
+    background: white;
+    color: var(--az-text);
+  }
+
+  .azure-mobile-menu {
+    padding: 12px 16px 17px;
     display: flex;
+    flex-direction: column;
+    gap: 7px;
+    border-top: 1px solid var(--az-border);
+    background: var(--az-paper);
   }
 
-  .landing-mobile-menu {
-    display: block;
+  .azure-mobile-menu a {
+    padding: 10px 11px;
+    border-radius: 8px;
+    color: var(--az-muted);
+    font-size: 10px;
+    font-weight: 650;
+    text-decoration: none;
   }
 
-  .landing-hero {
+  .azure-mobile-menu a.primary {
+    background: var(--az-aubergine);
+    color: white;
+  }
+
+  .azure-hero {
     min-height: auto;
   }
 
-  .landing-hero-layout {
-    padding-top: 85px;
+  .azure-hero-layout {
+    padding: 65px 0;
+    gap: 48px;
   }
 
-  .landing-aws-layout,
-  .landing-security-layout {
-    grid-template-columns:
-      1fr;
+  .azure-hero-copy h1 {
+    font-size: 47px;
+    letter-spacing: -2px;
   }
 
-  .landing-security-copy {
-    order: 1;
+  .azure-proof-grid {
+    grid-template-columns: repeat(2,1fr);
+    padding: 17px 0;
+    gap: 15px;
   }
 
-  .landing-security-visual {
-    order: 2;
+  .azure-proof-grid > div {
+    padding: 8px 0;
+    border-right: 0;
   }
 
-  .landing-architecture-flow {
-    flex-wrap: wrap;
+  .azure-section {
+    padding: 75px 0;
+  }
+
+  .azure-feature-grid,
+  .azure-architecture-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .azure-final-layout {
+    align-items: flex-start;
+    flex-direction: column;
   }
 }
 
-/* =========================================================
-   SMALL MOBILE
-   ========================================================= */
-
-@media (
-  max-width: 640px
-) {
-  .landing-container,
-  .landing-nav,
-  .landing-mobile-menu {
-    width:
-      min(
-        calc(100% - 28px),
-        1220px
-      );
+@media (max-width: 480px) {
+  .azure-landing-brand small {
+    display: none;
   }
 
-  .landing-nav {
-    height: 64px;
+  .azure-hero-copy h1 {
+    font-size: 40px;
   }
 
-  .landing-brand-mark {
-    width: 33px;
-    height: 33px;
-  }
-
-  .landing-brand strong {
-    font-size: 16px;
-  }
-
-  .landing-mobile-actions {
-    grid-template-columns:
-      1fr;
-  }
-
-  .landing-hero {
-    padding-top: 64px;
-  }
-
-  .landing-grid-background {
-    inset:
-      64px 0 0;
-
-    background-size:
-      40px 40px;
-  }
-
-  .landing-hero-layout {
-    padding-top: 67px;
-  }
-
-  .landing-hero-copy h1 {
-    margin-bottom: 20px;
-
-    font-size:
-      clamp(
-        42px,
-        13vw,
-        58px
-      );
-  }
-
-  .landing-hero-copy > p {
-    font-size: 14px;
-  }
-
-  .landing-hero-actions {
-    display: grid;
-    grid-template-columns:
-      1fr;
-
-    width: 100%;
-  }
-
-  .landing-primary-button,
-  .landing-secondary-button {
-    width: 100%;
-  }
-
-  .landing-trust-row {
+  .azure-hero-actions {
+    align-items: stretch;
     flex-direction: column;
-    align-items: flex-start;
-
-    width: max-content;
-    max-width: 100%;
-
-    margin-right: auto;
-    margin-left: auto;
   }
 
-  .landing-product-window {
-    border-radius: 16px;
-
-    transform: none;
+  .azure-primary-button,
+  .azure-secondary-button {
+    justify-content: center;
   }
 
-  .landing-window-top {
-    height: 48px;
-
-    padding:
-      0 12px;
+  .azure-platform-flow {
+    padding: 22px 18px;
   }
 
-  .landing-window-status {
+  .azure-flow-destinations {
+    grid-template-columns: 1fr;
+  }
+
+  .azure-flow-branches {
     display: none;
   }
 
-  .landing-window-body {
-    grid-template-columns:
-      43px minmax(0, 1fr);
-
-    min-height: 330px;
+  .azure-lifecycle {
+    gap: 4px;
   }
 
-  .landing-preview-sidebar {
-    gap: 5px;
-
-    padding-top: 12px;
+  .azure-lifecycle i {
+    width: 8px;
+    flex: 0 0 8px;
   }
 
-  .landing-preview-sidebar > div {
-    width: 30px;
-    height: 30px;
+  .azure-workflow-storage,
+  .azure-security-list {
+    grid-template-columns: 1fr;
   }
 
-  .landing-preview-main {
-    padding: 12px 10px;
+  .azure-final-layout h2 {
+    font-size: 31px;
   }
 
-  .landing-preview-heading {
-    margin-bottom: 12px;
-  }
-
-  .landing-preview-heading button {
-    width: 30px;
-
-    padding: 0;
-  }
-
-  .landing-preview-heading button span {
-    display: none;
-  }
-
-  .landing-preview-stats {
-    grid-template-columns:
-      1fr 1fr;
-  }
-
-  .landing-preview-stats > div:last-child {
-    display: none;
-  }
-
-  .landing-preview-bucket {
-    grid-template-columns:
-      30px minmax(0, 1fr);
-  }
-
-  .landing-preview-badge {
-    display: none;
-  }
-
-  .landing-floating-card {
-    display: none;
-  }
-
-  .landing-tech-strip {
-    margin-top: 35px;
-  }
-
-  .landing-tech-strip > div {
-    display: grid;
-    grid-template-columns:
-      repeat(3, auto);
-
-    gap: 13px 18px;
-  }
-
-  .landing-section {
-    padding:
-      80px 0;
-  }
-
-  .landing-section-heading {
-    margin-bottom: 34px;
-  }
-
-  .landing-section-heading h2,
-  .landing-aws-copy h2,
-  .landing-security-copy h2,
-  .landing-final-card h2 {
-    font-size: 32px;
-  }
-
-  .landing-section-heading p,
-  .landing-aws-copy > p,
-  .landing-security-copy > p,
-  .landing-final-card > p {
-    font-size: 13px;
-  }
-
-  .landing-feature-grid {
-    grid-template-columns:
-      1fr;
-  }
-
-  .landing-feature-card {
-    min-height: 0;
-
-    padding: 22px;
-  }
-
-  .landing-aws-points {
-    grid-template-columns:
-      1fr;
-  }
-
-  .landing-aws-visual {
-    min-height: 370px;
-  }
-
-  .landing-tree-branches {
-    grid-template-columns:
-      1fr;
-
-    gap: 9px;
-  }
-
-  .landing-tree-line {
-    height: 42px;
-  }
-
-  .landing-security-visual {
-    min-height: 330px;
-  }
-
-  .landing-security-ring.ring-one {
-    width: 290px;
-    height: 290px;
-  }
-
-  .landing-security-ring.ring-two {
-    width: 215px;
-    height: 215px;
-  }
-
-  .landing-security-ring.ring-three {
-    width: 145px;
-    height: 145px;
-  }
-
-  .landing-security-core {
-    width: 98px;
-    height: 98px;
-
-    border-radius: 24px;
-  }
-
-  .landing-security-core svg {
-    width: 32px;
-  }
-
-  .landing-security-chip {
-    padding:
-      8px 10px;
-
-    font-size: 8px;
-  }
-
-  .landing-security-list {
-    grid-template-columns:
-      1fr;
-  }
-
-  .landing-architecture-flow {
-    display: grid;
-    grid-template-columns:
-      1fr;
-
-    width:
-      min(
-        100%,
-        330px
-      );
-
-    margin-right: auto;
-    margin-left: auto;
-  }
-
-  .landing-architecture-flow > article {
-    width: auto;
-  }
-
-  .landing-flow-arrow {
-    display: none;
-  }
-
-  .landing-flow-services {
-    min-width: 0;
-  }
-
-  .landing-architecture-grid {
-    grid-template-columns:
-      repeat(2, 1fr);
-  }
-
-  .landing-final {
-    padding:
-      25px 0 80px;
-  }
-
-  .landing-final-card {
-    padding:
-      48px 20px;
-
-    border-radius: 20px;
-  }
-
-  .landing-footer-content {
-    grid-template-columns:
-      1fr;
-  }
-
-  .landing-footer-links {
-    flex-wrap: wrap;
-
-    gap: 16px;
-  }
-
-  .landing-footer-bottom {
-    grid-column: auto;
-
+  .azure-final-layout > div:last-child {
+    width: 100%;
     flex-direction: column;
+  }
+
+  .azure-final-layout a {
+    justify-content: center;
+  }
+
+  .azure-footer-layout {
+    padding: 22px 0;
     align-items: flex-start;
-
-    gap: 6px;
-  }
-}
-
-/* =========================================================
-   VERY SMALL DEVICES
-   ========================================================= */
-
-@media (
-  max-width: 390px
-) {
-  .landing-tech-strip > div {
-    grid-template-columns:
-      repeat(2, auto);
-  }
-
-  .landing-architecture-grid {
-    grid-template-columns:
-      1fr;
-  }
-
-  .landing-security-chip.chip-one {
-    left: 0;
-  }
-
-  .landing-security-chip.chip-two {
-    right: 0;
+    flex-direction: column;
   }
 }
