@@ -7,7 +7,7 @@ import {
 
 import ProtectedRoute from "./components/ProtectedRoute";
 
-import AwsStorage from "./pages/AwsStorage";
+import AzureStorage from "./pages/AzureStorage";
 import Dashboard from "./pages/Dashboard";
 import Landing from "./pages/Landing";
 import Login from "./pages/Login";
@@ -20,23 +20,17 @@ export default function App() {
       <Routes>
         <Route
           path="/"
-          element={
-            <Landing />
-          }
+          element={<Landing />}
         />
 
         <Route
           path="/login"
-          element={
-            <Login />
-          }
+          element={<Login />}
         />
 
         <Route
           path="/register"
-          element={
-            <Register />
-          }
+          element={<Register />}
         />
 
         <Route
@@ -58,11 +52,22 @@ export default function App() {
         />
 
         <Route
-          path="/aws-storage"
+          path="/storage"
           element={
             <ProtectedRoute>
-              <AwsStorage />
+              <AzureStorage />
             </ProtectedRoute>
+          }
+        />
+
+        {/* Temporary compatibility redirect while old pages are migrated */}
+        <Route
+          path="/aws-storage"
+          element={
+            <Navigate
+              to="/storage"
+              replace
+            />
           }
         />
 
