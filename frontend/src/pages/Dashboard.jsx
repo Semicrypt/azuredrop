@@ -1,13 +1,15 @@
 import {
+  Boxes,
   Cloud,
-  Database,
   File,
+  FileArchive,
+  FileImage,
+  FileSpreadsheet,
   FileText,
-  Filter,
+  FolderOpen,
   HardDrive,
   LogOut,
   Menu,
-  MoreHorizontal,
   RefreshCw,
   Search,
   Share2,
@@ -81,41 +83,54 @@ function formatSize(bytes) {
   ).toFixed(1)} GB`;
 }
 
-function formatStorageMode(
-  storageMode
-) {
-  const value =
-    String(
-      storageMode || ""
-    ).toLowerCase();
-
-  if (
-    value.includes(
-      "customer"
-    ) ||
-    value.includes(
-      "aws"
-    )
-  ) {
-    return "My AWS";
+function formatDate(value) {
+  if (!value) {
+    return "—";
   }
 
-  return "Managed";
+  const date =
+    new Date(value);
+
+  if (
+    Number.isNaN(
+      date.getTime()
+    )
+  ) {
+    return "—";
+  }
+
+  return new Intl.DateTimeFormat(
+    "en",
+    {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    }
+  ).format(date);
 }
 
-function DashboardBrand() {
-  return (
-    <div className="dashboard-brand">
-      <span className="dashboard-brand-mark">
-        <Cloud size={19} />
-      </span>
+function getFileIcon(category) {
+  switch (
+    String(
+      category || ""
+    ).toLowerCase()
+  ) {
+    case "images":
+      return FileImage;
 
-      <strong>
-        Cloud
-        <em>Drop</em>
-      </strong>
-    </div>
-  );
+    case "spreadsheets":
+      return FileSpreadsheet;
+
+    case "archives":
+      return FileArchive;
+
+    case "documents":
+    case "text":
+      return FileText;
+
+    default:
+      return File;
+  }
 }
 
 export default function Dashboard() {
@@ -126,26 +141,6 @@ export default function Dashboard() {
     files,
     setFiles,
   ] = useState([]);
-
-  const [
-    connection,
-    setConnection,
-  ] = useState(null);
-
-  const [
-    buckets,
-    setBuckets,
-  ] = useState([]);
-
-  const [
-    search,
-    setSearch,
-  ] = useState("");
-
-  const [
-    category,
-    setCategory,
-  ] = useState("all");
 
   const [
     loading,
@@ -163,6 +158,16 @@ export default function Dashboard() {
   ] = useState("");
 
   const [
+    search,
+    setSearch,
+  ] = useState("");
+
+  const [
+    category,
+    setCategory,
+  ] = useState("all");
+
+  const [
     uploadOpen,
     setUploadOpen,
   ] = useState(false);
@@ -173,8 +178,8 @@ export default function Dashboard() {
   ] = useState(null);
 
   const [
-    mobileSidebarOpen,
-    setMobileSidebarOpen,
+    mobileMenuOpen,
+    setMobileMenuOpen,
   ] = useState(false);
 
   const user = useMemo(() => {
@@ -207,7 +212,7 @@ export default function Dashboard() {
       );
     }, [navigate]);
 
-  const loadWorkspace =
+  const loadFiles =
     useCallback(
       async ({
         quiet = false,
@@ -216,73 +221,28 @@ export default function Dashboard() {
           setError("");
         }
 
-        const results =
-          await Promise.allSettled([
-            api.get(
+        try {
+          const response =
+            await api.get(
               "/api/files"
-            ),
+            );
 
-            api.get(
-              "/api/aws/connection"
-            ),
-
-            api.get(
-              "/api/aws/buckets"
-            ),
-          ]);
-
-        const [
-          filesResult,
-          connectionResult,
-          bucketsResult,
-        ] = results;
-
-        if (
-          filesResult.status ===
-          "rejected"
+          setFiles(
+            response.data?.data
+              ?.files || []
+          );
+        } catch (
+          requestError
         ) {
           if (
-            filesResult.reason
-              ?.response
+            requestError.response
               ?.status === 401
           ) {
             logout();
-
             return;
           }
 
-          throw new Error(
-            "Unable to load your files."
-          );
-        }
-
-        setFiles(
-          filesResult.value
-            ?.data?.data
-            ?.files || []
-        );
-
-        if (
-          connectionResult.status ===
-          "fulfilled"
-        ) {
-          setConnection(
-            connectionResult.value
-              ?.data?.data
-              ?.connection ||
-              null
-          );
-        }
-
-        if (
-          bucketsResult.status ===
-          "fulfilled"
-        ) {
-          setBuckets(
-            bucketsResult.value
-              ?.data?.data
-              ?.buckets || []
-          );
+          throw requestError;
         }
       },
       [logout]
@@ -291,86 +251,41 @@ export default function Dashboard() {
   useEffect(() => {
     let active = true;
 
-    async function loadInitialWorkspace() {
+    async function load() {
       try {
-        const results =
-          await Promise.allSettled([
-            api.get(
-              "/api/files"
-            ),
-
-            api.get(
-              "/api/aws/connection"
-            ),
-
-            api.get(
-              "/api/aws/buckets"
-            ),
-          ]);
+        const response =
+          await api.get(
+            "/api/files"
+          );
 
         if (!active) {
           return;
         }
 
-        const [
-          filesResult,
-          connectionResult,
-          bucketsResult,
-        ] = results;
-
-        if (
-          filesResult.status ===
-          "rejected"
-        ) {
-          if (
-            filesResult.reason
-              ?.response
-              ?.status === 401
-          ) {
-            logout();
-
-            return;
-          }
-
-          throw new Error(
-            "Unable to load your files."
-          );
-        }
-
         setFiles(
-          filesResult.value
-            ?.data?.data
+          response.data?.data
             ?.files || []
         );
-
-        if (
-          connectionResult.status ===
-          "fulfilled"
-        ) {
-          setConnection(
-            connectionResult.value
-              ?.data?.data
-              ?.connection ||
-              null
-          );
+      } catch (
+        requestError
+      ) {
+        if (!active) {
+          return;
         }
 
         if (
-          bucketsResult.status ===
-          "fulfilled"
+          requestError.response
+            ?.status === 401
         ) {
-          setBuckets(
-            bucketsResult.value
-              ?.data?.data
-              ?.buckets || []
-          );
+          logout();
+          return;
         }
-      } catch {
-        if (active) {
-          setError(
-            "Unable to load your workspace."
-          );
-        }
+
+        setError(
+          requestError.response
+            ?.data?.message ||
+            "Unable to load your AzureDrop workspace."
+        );
       } finally {
         if (active) {
           setLoading(false);
@@ -378,7 +293,7 @@ export default function Dashboard() {
       }
     }
 
-    loadInitialWorkspace();
+    load();
 
     return () => {
       active = false;
@@ -388,66 +303,96 @@ export default function Dashboard() {
   const refreshWorkspace =
     useCallback(async () => {
       setRefreshing(true);
+      setError("");
 
       try {
-        await loadWorkspace();
+        await loadFiles({
+          quiet: true,
+        });
       } catch (
         requestError
       ) {
         setError(
-          requestError.message ||
+          requestError.response
+            ?.data?.message ||
             "Unable to refresh your workspace."
         );
       } finally {
         setRefreshing(false);
       }
-    }, [loadWorkspace]);
+    }, [loadFiles]);
+
+  const handleUploaded =
+    useCallback(async () => {
+      setUploadOpen(false);
+
+      try {
+        await loadFiles({
+          quiet: true,
+        });
+      } catch {
+        setError(
+          "File uploaded, but the workspace could not be refreshed."
+        );
+      }
+    }, [loadFiles]);
+
+  const handleDeleted =
+    useCallback(async () => {
+      setSelectedFile(null);
+
+      try {
+        await loadFiles({
+          quiet: true,
+        });
+      } catch {
+        setError(
+          "File deleted, but the workspace could not be refreshed."
+        );
+      }
+    }, [loadFiles]);
 
   const filteredFiles =
-    useMemo(
-      () =>
-        files.filter(
-          (file) => {
-            const fileName =
-              String(
-                file.original_name ||
-                  ""
-              ).toLowerCase();
+    useMemo(() => {
+      const query =
+        search
+          .trim()
+          .toLowerCase();
 
-            const matchesSearch =
-              fileName.includes(
-                search
-                  .trim()
-                  .toLowerCase()
-              );
+      return files.filter(
+        (file) => {
+          const name =
+            String(
+              file.original_name ||
+                ""
+            ).toLowerCase();
 
-            const matchesCategory =
-              category ===
-                "all" ||
-              file.category ===
-                category;
+          const matchesSearch =
+            !query ||
+            name.includes(query);
 
-            return (
-              matchesSearch &&
-              matchesCategory
-            );
-          }
-        ),
-      [
-        files,
-        search,
-        category,
-      ]
-    );
+          const matchesCategory =
+            category === "all" ||
+            file.category ===
+              category;
 
-  const totalBytes =
+          return (
+            matchesSearch &&
+            matchesCategory
+          );
+        }
+      );
+    }, [
+      files,
+      search,
+      category,
+    ]);
+
+  const totalSize =
     useMemo(
       () =>
         files.reduce(
-          (
-            total,
-            file
-          ) =>
+          (total, file) =>
             total +
             Number(
               file.size_bytes ||
@@ -458,346 +403,309 @@ export default function Dashboard() {
       [files]
     );
 
-  const defaultBucket =
+  const categoryCount =
     useMemo(
       () =>
-        buckets.find(
-          (bucket) =>
-            bucket.is_default
-        ) || null,
-      [buckets]
+        new Set(
+          files
+            .map(
+              (file) =>
+                file.category
+            )
+            .filter(Boolean)
+        ).size,
+      [files]
     );
 
-  const awsConnected =
-    connection?.status ===
-    "CONNECTED";
+  const recentUpload =
+    useMemo(() => {
+      if (!files.length) {
+        return null;
+      }
 
-  const closeMobileSidebar =
-    () => {
-      setMobileSidebarOpen(
-        false
-      );
-    };
-
-  const openUpload =
-    () => {
-      closeMobileSidebar();
-
-      setUploadOpen(true);
-    };
-
-  const goToStorage =
-    () => {
-      closeMobileSidebar();
-
-      navigate(
-        "/aws-storage"
-      );
-    };
-
-  const goToShared =
-    () => {
-      closeMobileSidebar();
-
-      navigate(
-        "/shared"
-      );
-    };
+      return [...files].sort(
+        (a, b) =>
+          new Date(
+            b.uploaded_at
+          ).getTime() -
+          new Date(
+            a.uploaded_at
+          ).getTime()
+      )[0];
+    }, [files]);
 
   const firstName =
     user?.name
       ?.trim()
       ?.split(/\s+/)[0] ||
-    "";
+    "there";
+
+  if (loading) {
+    return (
+      <div className="az-dashboard-loading">
+        <div className="az-loading-logo">
+          <Cloud size={28} />
+        </div>
+
+        <strong>
+          Loading AzureDrop
+        </strong>
+
+        <span>
+          Preparing your secure
+          workspace…
+        </span>
+      </div>
+    );
+  }
 
   return (
-    <main className="dashboard-page">
+    <div className="az-dashboard">
       <aside
-        className={`dashboard-sidebar ${
-          mobileSidebarOpen
-            ? "mobile-open"
+        className={`az-sidebar ${
+          mobileMenuOpen
+            ? "open"
             : ""
         }`}
       >
-        <div>
-          <div className="dashboard-sidebar-top">
-            <DashboardBrand />
-
-            <button
-              className="dashboard-sidebar-close"
-              type="button"
-              aria-label="Close navigation"
-              onClick={
-                closeMobileSidebar
-              }
-            >
-              <X size={19} />
-            </button>
+        <div className="az-sidebar-brand">
+          <div className="az-brand-icon">
+            <Cloud size={22} />
           </div>
 
-          <nav className="dashboard-sidebar-nav">
-            <span className="dashboard-nav-label">
-              Workspace
-            </span>
-
-            <button
-              className="dashboard-nav-link active"
-              type="button"
-              onClick={
-                closeMobileSidebar
-              }
-            >
-              <FileText
-                size={18}
-              />
-
+          <div>
+            <strong>
+              Azure
               <span>
-                My Files
+                Drop
               </span>
-            </button>
+            </strong>
 
-            <button
-              className="dashboard-nav-link"
-              type="button"
-              onClick={
-                openUpload
-              }
-            >
-              <UploadCloud
-                size={18}
-              />
-
-              <span>
-                Upload
-              </span>
-            </button>
-
-            <button
-              className="dashboard-nav-link"
-              type="button"
-              onClick={
-                goToShared
-              }
-            >
-              <Share2
-                size={18}
-              />
-
-              <span>
-                Shared
-              </span>
-            </button>
-
-            <span className="dashboard-nav-label dashboard-storage-label">
-              Storage
-            </span>
-
-            <button
-              className="dashboard-nav-link"
-              type="button"
-              onClick={
-                goToStorage
-              }
-            >
-              <HardDrive
-                size={18}
-              />
-
-              <span>
-                CloudDrop Storage
-              </span>
-
-              {awsConnected && (
-                <i className="dashboard-nav-status" />
-              )}
-            </button>
-
-            <button
-              className="dashboard-nav-link dashboard-sub-link"
-              type="button"
-              onClick={
-                goToStorage
-              }
-            >
-              <Database
-                size={16}
-              />
-
-              <span>
-                My AWS
-              </span>
-
-              {buckets.length >
-                0 && (
-                <small>
-                  {
-                    buckets.length
-                  }
-                </small>
-              )}
-            </button>
-          </nav>
+            <small>
+              Cloud workspace
+            </small>
+          </div>
         </div>
 
-        <div className="dashboard-sidebar-bottom">
-          <div className="dashboard-user-mini">
-            <span>
-              {user?.name
-                ?.trim()
-                ?.charAt(0)
-                ?.toUpperCase() ||
-                "U"}
-            </span>
+        <button
+          className="az-mobile-close"
+          type="button"
+          onClick={() =>
+            setMobileMenuOpen(
+              false
+            )
+          }
+        >
+          <X size={20} />
+        </button>
+
+        <nav className="az-sidebar-nav">
+          <button
+            className="active"
+            type="button"
+          >
+            <HardDrive
+              size={18}
+            />
+            Overview
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              setMobileMenuOpen(
+                false
+              );
+
+              document
+                .getElementById(
+                  "files"
+                )
+                ?.scrollIntoView({
+                  behavior:
+                    "smooth",
+                });
+            }}
+          >
+            <FolderOpen
+              size={18}
+            />
+            Files
+          </button>
+
+          <button
+            type="button"
+            onClick={() =>
+              navigate(
+                "/shared"
+              )
+            }
+          >
+            <Share2 size={18} />
+            Shared
+          </button>
+
+          <button
+            type="button"
+            onClick={() =>
+              navigate(
+                "/storage"
+              )
+            }
+          >
+            <Boxes size={18} />
+            Storage
+          </button>
+        </nav>
+
+        <div className="az-sidebar-bottom">
+          <div className="az-security-card">
+            <ShieldCheck
+              size={20}
+            />
 
             <div>
               <strong>
-                {user?.name ||
-                  "CloudDrop User"}
+                Secure workspace
               </strong>
 
-              <small>
-                {user?.email ||
-                  ""}
-              </small>
+              <span>
+                Azure Blob enabled
+              </span>
             </div>
           </div>
 
           <button
-            className="dashboard-nav-link dashboard-logout-link"
+            className="az-logout-button"
             type="button"
-            onClick={
-              logout
-            }
+            onClick={logout}
           >
-            <LogOut
-              size={18}
-            />
-
-            <span>
-              Sign out
-            </span>
+            <LogOut size={17} />
+            Sign out
           </button>
         </div>
       </aside>
 
-      {mobileSidebarOpen && (
+      {mobileMenuOpen && (
         <button
-          className="dashboard-sidebar-backdrop"
+          className="az-sidebar-overlay"
           type="button"
           aria-label="Close navigation"
-          onClick={
-            closeMobileSidebar
+          onClick={() =>
+            setMobileMenuOpen(
+              false
+            )
           }
         />
       )}
 
-      <section className="dashboard-content">
-        <header className="dashboard-mobile-header">
-          <DashboardBrand />
-
+      <main className="az-main">
+        <header className="az-topbar">
           <button
+            className="az-menu-button"
             type="button"
-            aria-label="Open navigation"
             onClick={() =>
-              setMobileSidebarOpen(
+              setMobileMenuOpen(
                 true
               )
             }
           >
             <Menu size={21} />
           </button>
+
+          <div className="az-topbar-title">
+            <span>
+              WORKSPACE
+            </span>
+
+            <strong>
+              Overview
+            </strong>
+          </div>
+
+          <div className="az-topbar-actions">
+            <div className="az-system-status">
+              <span />
+              Blob Storage ready
+            </div>
+
+            <button
+              className="az-refresh"
+              type="button"
+              disabled={refreshing}
+              onClick={
+                refreshWorkspace
+              }
+            >
+              <RefreshCw
+                size={17}
+                className={
+                  refreshing
+                    ? "az-spin"
+                    : ""
+                }
+              />
+            </button>
+
+            <div className="az-user-avatar">
+              {firstName
+                .charAt(0)
+                .toUpperCase()}
+            </div>
+          </div>
         </header>
 
-        <div className="dashboard-content-inner">
-          <header className="dashboard-header">
-            <div className="dashboard-heading">
-              <span className="dashboard-eyebrow">
-                Workspace
-              </span>
+        <section className="az-welcome">
+          <div>
+            <span className="az-eyebrow">
+              AZUREDROP
+            </span>
 
-              <h1>
-                Welcome
-                {firstName
-                  ? `, ${firstName}`
-                  : ""}
-                .
-              </h1>
-
-              <p>
-                Manage your files,
-                sharing and cloud
-                storage from one
-                secure workspace.
-              </p>
-            </div>
-
-            <div className="dashboard-header-actions">
-              <button
-                className="dashboard-refresh-button"
-                type="button"
-                aria-label="Refresh workspace"
-                disabled={
-                  refreshing
-                }
-                onClick={
-                  refreshWorkspace
-                }
-              >
-                <RefreshCw
-                  size={17}
-                  className={
-                    refreshing
-                      ? "dashboard-spin"
-                      : ""
-                  }
-                />
-              </button>
-
-              <button
-                className="dashboard-primary-button"
-                type="button"
-                onClick={
-                  openUpload
-                }
-              >
-                <UploadCloud
-                  size={18}
-                />
-
-                Upload file
-              </button>
-            </div>
-          </header>
-
-          {error && (
-            <div className="dashboard-error-banner">
-              <ShieldCheck
-                size={17}
-              />
-
+            <h1>
+              Good to see you,
               <span>
-                {error}
+                {" "}
+                {firstName}.
               </span>
+            </h1>
 
-              <button
-                type="button"
-                onClick={() =>
-                  setError("")
-                }
-              >
-                <X size={16} />
-              </button>
+            <p>
+              Securely upload,
+              organize and share
+              files backed by Azure
+              Blob Storage.
+            </p>
+          </div>
+
+          <button
+            className="az-upload-primary"
+            type="button"
+            onClick={() =>
+              setUploadOpen(true)
+            }
+          >
+            <UploadCloud
+              size={19}
+            />
+            Upload file
+          </button>
+        </section>
+
+        {error && (
+          <div className="az-error-banner">
+            {error}
+          </div>
+        )}
+
+        <section className="az-stats">
+          <article>
+            <div className="az-stat-icon rust">
+              <FileText
+                size={21}
+              />
             </div>
-          )}
 
-          <section className="dashboard-stats-grid">
-            <article className="dashboard-stat-card">
-              <div className="dashboard-stat-icon blue">
-                <FileText
-                  size={20}
-                />
-              </div>
-
+            <div>
               <span>
                 Total files
               </span>
@@ -807,458 +715,456 @@ export default function Dashboard() {
               </strong>
 
               <small>
-                Stored in your
-                workspace
+                Azure Blob objects
               </small>
-            </article>
+            </div>
+          </article>
 
-            <article className="dashboard-stat-card">
-              <div className="dashboard-stat-icon cyan">
-                <HardDrive
-                  size={20}
-                />
-              </div>
+          <article>
+            <div className="az-stat-icon copper">
+              <HardDrive
+                size={21}
+              />
+            </div>
 
+            <div>
               <span>
                 Storage used
               </span>
 
               <strong>
                 {formatSize(
-                  totalBytes
+                  totalSize
                 )}
               </strong>
 
               <small>
                 Across all files
               </small>
-            </article>
+            </div>
+          </article>
 
-            <article className="dashboard-stat-card">
-              <div className="dashboard-stat-icon green">
-                <ShieldCheck
-                  size={20}
-                />
-              </div>
+          <article>
+            <div className="az-stat-icon cream">
+              <FolderOpen
+                size={21}
+              />
+            </div>
 
+            <div>
               <span>
-                Security
+                Categories
               </span>
 
-              <strong className="dashboard-stat-text">
-                Private
+              <strong>
+                {categoryCount}
               </strong>
 
               <small>
-                Signed access only
+                File groups
               </small>
-            </article>
+            </div>
+          </article>
 
-            <article
-              className="dashboard-stat-card dashboard-storage-stat"
-              role="button"
-              tabIndex={0}
-              onClick={
-                goToStorage
-              }
-              onKeyDown={(
-                event
-              ) => {
-                if (
-                  event.key ===
-                    "Enter" ||
-                  event.key ===
-                    " "
-                ) {
-                  goToStorage();
-                }
-              }}
-            >
-              <div className="dashboard-stat-icon purple">
-                <Database
-                  size={20}
-                />
-              </div>
+          <article>
+            <div className="az-stat-icon green">
+              <Cloud size={21} />
+            </div>
 
+            <div>
               <span>
                 Storage
               </span>
 
-              <strong className="dashboard-stat-text">
-                {awsConnected
-                  ? "My AWS"
-                  : "Managed"}
+              <strong>
+                Azure Blob
               </strong>
 
               <small>
-                {awsConnected
-                  ? `${buckets.length} AWS bucket${
-                      buckets.length ===
-                      1
-                        ? ""
-                        : "s"
-                    }`
-                  : "CloudDrop managed"}
+                Private container
               </small>
-            </article>
-          </section>
+            </div>
+          </article>
+        </section>
 
-          <section className="dashboard-storage-summary">
-            <div className="dashboard-storage-summary-main">
-              <div className="dashboard-storage-summary-icon">
-                <Database
-                  size={21}
-                />
+        <section className="az-dashboard-grid">
+          <article className="az-storage-summary">
+            <div className="az-card-heading">
+              <div>
+                <span>
+                  STORAGE
+                </span>
+
+                <h2>
+                  Azure Blob
+                  workspace
+                </h2>
+              </div>
+
+              <button
+                type="button"
+                onClick={() =>
+                  navigate(
+                    "/storage"
+                  )
+                }
+              >
+                View storage
+              </button>
+            </div>
+
+            <div className="az-storage-visual">
+              <div className="az-storage-orb">
+                <Cloud size={32} />
+              </div>
+
+              <div>
+                <strong>
+                  azuredrop-files
+                </strong>
+
+                <span>
+                  Private Blob
+                  container
+                </span>
+              </div>
+
+              <div className="az-storage-health">
+                <span />
+                Healthy
+              </div>
+            </div>
+
+            <div className="az-storage-details">
+              <div>
+                <span>
+                  Provider
+                </span>
+
+                <strong>
+                  Azure Blob Storage
+                </strong>
               </div>
 
               <div>
                 <span>
-                  Active storage
+                  Access
                 </span>
 
                 <strong>
-                  {awsConnected
-                    ? "Connected AWS storage"
-                    : "CloudDrop Managed Storage"}
+                  Private
+                </strong>
+              </div>
+
+              <div>
+                <span>
+                  Downloads
+                </span>
+
+                <strong>
+                  Temporary SAS
+                </strong>
+              </div>
+
+              <div>
+                <span>
+                  Metadata
+                </span>
+
+                <strong>
+                  PostgreSQL
+                </strong>
+              </div>
+            </div>
+          </article>
+
+          <article className="az-activity-card">
+            <div className="az-card-heading">
+              <div>
+                <span>
+                  ACTIVITY
+                </span>
+
+                <h2>
+                  Latest upload
+                </h2>
+              </div>
+            </div>
+
+            {recentUpload ? (
+              <div className="az-latest-file">
+                <div className="az-latest-icon">
+                  <FileText
+                    size={23}
+                  />
+                </div>
+
+                <strong>
+                  {
+                    recentUpload.original_name
+                  }
                 </strong>
 
-                <p>
-                  {awsConnected
-                    ? defaultBucket
-                      ? `New AWS uploads use ${defaultBucket.bucket_name}.`
-                      : "Your AWS account is connected. Select a default bucket for customer storage."
-                    : "Files can be stored using CloudDrop's managed storage. You can connect AWS at any time."}
-                </p>
+                <span>
+                  {formatSize(
+                    recentUpload.size_bytes
+                  )}
+                  {" · "}
+                  {recentUpload.category ||
+                    "file"}
+                </span>
+
+                <small>
+                  Uploaded{" "}
+                  {formatDate(
+                    recentUpload.uploaded_at
+                  )}
+                </small>
               </div>
+            ) : (
+              <div className="az-no-activity">
+                <UploadCloud
+                  size={25}
+                />
+
+                <strong>
+                  No uploads yet
+                </strong>
+
+                <span>
+                  Your latest file
+                  will appear here.
+                </span>
+              </div>
+            )}
+          </article>
+        </section>
+
+        <section
+          className="az-files-section"
+          id="files"
+        >
+          <div className="az-files-heading">
+            <div>
+              <span>
+                YOUR FILES
+              </span>
+
+              <h2>
+                File library
+              </h2>
+
+              <p>
+                {filteredFiles.length}{" "}
+                {filteredFiles.length ===
+                1
+                  ? "file"
+                  : "files"}{" "}
+                shown
+              </p>
             </div>
 
             <button
               type="button"
-              onClick={
-                goToStorage
+              onClick={() =>
+                setUploadOpen(
+                  true
+                )
               }
             >
-              Manage storage
+              <UploadCloud
+                size={17}
+              />
+              Upload
             </button>
-          </section>
+          </div>
 
-          <section className="dashboard-files-panel">
-            <div className="dashboard-files-toolbar">
-              <div>
-                <span>
-                  File manager
-                </span>
+          <div className="az-file-toolbar">
+            <div className="az-search">
+              <Search size={17} />
 
-                <h2>
-                  My Files
-                </h2>
+              <input
+                type="search"
+                placeholder="Search files..."
+                value={search}
+                onChange={(event) =>
+                  setSearch(
+                    event.target
+                      .value
+                  )
+                }
+              />
+            </div>
 
-                <p>
-                  Search, inspect,
-                  download and share
-                  your CloudDrop
-                  files.
-                </p>
-              </div>
-
-              <div className="dashboard-files-controls">
-                <div className="dashboard-category-filter">
-                  <Filter
-                    size={16}
-                  />
-
-                  <select
-                    value={
-                      category
+            <div className="az-category-tabs">
+              {CATEGORIES.map(
+                (item) => (
+                  <button
+                    className={
+                      category ===
+                      item
+                        ? "active"
+                        : ""
                     }
-                    onChange={(
-                      event
-                    ) =>
+                    key={item}
+                    type="button"
+                    onClick={() =>
                       setCategory(
-                        event
-                          .target
-                          .value
+                        item
                       )
                     }
                   >
-                    {CATEGORIES.map(
-                      (item) => (
-                        <option
-                          key={
-                            item
-                          }
-                          value={
-                            item
-                          }
-                        >
-                          {item ===
-                          "all"
-                            ? "All categories"
-                            : item}
-                        </option>
-                      )
-                    )}
-                  </select>
-                </div>
-
-                <div className="dashboard-search-box">
-                  <Search
-                    size={17}
-                  />
-
-                  <input
-                    value={
-                      search
-                    }
-                    onChange={(
-                      event
-                    ) =>
-                      setSearch(
-                        event
-                          .target
-                          .value
-                      )
-                    }
-                    placeholder="Search files..."
-                  />
-
-                  {search && (
-                    <button
-                      type="button"
-                      aria-label="Clear search"
-                      onClick={() =>
-                        setSearch("")
-                      }
-                    >
-                      <X
-                        size={14}
-                      />
-                    </button>
-                  )}
-                </div>
-              </div>
+                    {item}
+                  </button>
+                )
+              )}
             </div>
+          </div>
 
-            {loading ? (
-              <div className="dashboard-empty-state">
-                <span className="dashboard-loader-ring" />
-
-                <h3>
-                  Loading files
-                </h3>
-
-                <p>
-                  Getting your
-                  CloudDrop workspace
-                  ready…
-                </p>
+          {filteredFiles.length ===
+          0 ? (
+            <div className="az-empty-files">
+              <div>
+                <UploadCloud
+                  size={28}
+                />
               </div>
-            ) : filteredFiles.length ===
-              0 ? (
-              <div className="dashboard-empty-state">
-                <div className="dashboard-empty-icon">
-                  <File
-                    size={28}
-                  />
-                </div>
 
-                <h3>
-                  {search ||
-                  category !==
-                    "all"
-                    ? "No matching files"
-                    : "Your workspace is empty"}
-                </h3>
+              <h3>
+                {files.length
+                  ? "No matching files"
+                  : "Your file library is empty"}
+              </h3>
 
-                <p>
-                  {search ||
-                  category !==
-                    "all"
-                    ? "Try changing your search or category filter."
-                    : "Upload your first file to start using CloudDrop."}
-                </p>
+              <p>
+                {files.length
+                  ? "Try another search or category."
+                  : "Upload your first file and AzureDrop will store it securely in Blob Storage."}
+              </p>
 
-                {!search &&
-                  category ===
-                    "all" && (
+              {!files.length && (
+                <button
+                  type="button"
+                  onClick={() =>
+                    setUploadOpen(
+                      true
+                    )
+                  }
+                >
+                  Upload first file
+                </button>
+              )}
+            </div>
+          ) : (
+            <div className="az-file-table">
+              <div className="az-file-table-head">
+                <span>
+                  Name
+                </span>
+                <span>
+                  Category
+                </span>
+                <span>
+                  Size
+                </span>
+                <span>
+                  Storage
+                </span>
+                <span>
+                  Uploaded
+                </span>
+              </div>
+
+              {filteredFiles.map(
+                (file) => {
+                  const Icon =
+                    getFileIcon(
+                      file.category
+                    );
+
+                  return (
                     <button
-                      className="dashboard-primary-button"
+                      className="az-file-row"
                       type="button"
-                      onClick={
-                        openUpload
+                      key={file.id}
+                      onClick={() =>
+                        setSelectedFile(
+                          file
+                        )
                       }
                     >
-                      <UploadCloud
-                        size={17}
-                      />
-
-                      Upload file
-                    </button>
-                  )}
-              </div>
-            ) : (
-              <div className="dashboard-file-table">
-                <div className="dashboard-file-table-head">
-                  <span>
-                    Name
-                  </span>
-
-                  <span>
-                    Category
-                  </span>
-
-                  <span>
-                    Storage
-                  </span>
-
-                  <span>
-                    Size
-                  </span>
-
-                  <span>
-                    Uploaded
-                  </span>
-
-                  <span />
-                </div>
-
-                <div className="dashboard-file-list">
-                  {filteredFiles.map(
-                    (file) => (
-                      <div
-                        className="dashboard-file-row"
-                        key={
-                          file.id
-                        }
-                        role="button"
-                        tabIndex={0}
-                        onClick={() =>
-                          setSelectedFile(
-                            file
-                          )
-                        }
-                        onKeyDown={(
-                          event
-                        ) => {
-                          if (
-                            event.key ===
-                              "Enter" ||
-                            event.key ===
-                              " "
-                          ) {
-                            setSelectedFile(
-                              file
-                            );
-                          }
-                        }}
-                      >
-                        <div className="dashboard-file-name-cell">
-                          <div className="dashboard-file-icon">
-                            <FileText
-                              size={18}
-                            />
-                          </div>
-
-                          <div>
-                            <strong>
-                              {
-                                file.original_name
-                              }
-                            </strong>
-
-                            <span>
-                              {file.mime_type ||
-                                "File"}
-                            </span>
-                          </div>
-                        </div>
-
-                        <span className="dashboard-category-pill">
-                          {file.category ||
-                            "other"}
-                        </span>
-
-                        <span className="dashboard-storage-pill">
-                          {formatStorageMode(
-                            file.storage_mode
-                          )}
-                        </span>
-
-                        <span className="dashboard-file-meta">
-                          {formatSize(
-                            Number(
-                              file.size_bytes
-                            )
-                          )}
-                        </span>
-
-                        <span className="dashboard-file-meta">
-                          {new Date(
-                            file.uploaded_at
-                          ).toLocaleDateString()}
-                        </span>
-
-                        <button
-                          type="button"
-                          className="dashboard-file-more"
-                          aria-label={`Open actions for ${file.original_name}`}
-                          onClick={(
-                            event
-                          ) => {
-                            event.stopPropagation();
-
-                            setSelectedFile(
-                              file
-                            );
-                          }}
-                        >
-                          <MoreHorizontal
-                            size={18}
+                      <span className="az-file-name-cell">
+                        <span className="az-file-type-icon">
+                          <Icon
+                            size={19}
                           />
-                        </button>
-                      </div>
-                    )
-                  )}
-                </div>
-              </div>
-            )}
-          </section>
-        </div>
-      </section>
+                        </span>
+
+                        <span>
+                          <strong>
+                            {
+                              file.original_name
+                            }
+                          </strong>
+
+                          <small>
+                            {file.mime_type ||
+                              "File"}
+                          </small>
+                        </span>
+                      </span>
+
+                      <span className="az-category-badge">
+                        {file.category ||
+                          "other"}
+                      </span>
+
+                      <span>
+                        {formatSize(
+                          file.size_bytes
+                        )}
+                      </span>
+
+                      <span className="az-provider-badge">
+                        Azure Blob
+                      </span>
+
+                      <span>
+                        {formatDate(
+                          file.uploaded_at
+                        )}
+                      </span>
+                    </button>
+                  );
+                }
+              )}
+            </div>
+          )}
+        </section>
+      </main>
 
       <UploadModal
-        open={
-          uploadOpen
-        }
+        open={uploadOpen}
         onClose={() =>
-          setUploadOpen(
-            false
-          )
+          setUploadOpen(false)
         }
         onUploaded={
-          refreshWorkspace
+          handleUploaded
         }
       />
 
-      {selectedFile && (
-        <FileDetailsModal
-          key={
-            selectedFile.id
-          }
-          open
-          file={
-            selectedFile
-          }
-          onClose={() =>
-            setSelectedFile(
-              null
-            )
-          }
-          onDeleted={
-            refreshWorkspace
-          }
-        />
-      )}
-    </main>
+      <FileDetailsModal
+        file={selectedFile}
+        open={Boolean(
+          selectedFile
+        )}
+        onClose={() =>
+          setSelectedFile(null)
+        }
+        onDeleted={
+          handleDeleted
+        }
+      />
+    </div>
   );
 }
