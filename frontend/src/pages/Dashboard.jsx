@@ -158,6 +158,11 @@ export default function Dashboard() {
   ] = useState("");
 
   const [
+    healthStatus,
+    setHealthStatus,
+  ] = useState("checking");
+
+  const [
     search,
     setSearch,
   ] = useState("");
@@ -212,6 +217,45 @@ export default function Dashboard() {
       );
     }, [navigate]);
 
+  const loadHealth =
+    useCallback(
+      async () => {
+        setHealthStatus(
+          "checking"
+        );
+
+        try {
+          const response =
+            await api.get(
+              "/health"
+            );
+
+          const data =
+            response.data;
+
+          const healthy =
+            data?.success === true &&
+            data?.status ===
+              "healthy" &&
+            data?.database ===
+              "healthy" &&
+            data?.storage ===
+              "healthy";
+
+          setHealthStatus(
+            healthy
+              ? "healthy"
+              : "unhealthy"
+          );
+        } catch {
+          setHealthStatus(
+            "unhealthy"
+          );
+        }
+      },
+      []
+    );
+
   const loadFiles =
     useCallback(
       async ({
@@ -247,6 +291,10 @@ export default function Dashboard() {
       },
       [logout]
     );
+
+  useEffect(() => {
+    loadHealth();
+  }, [loadHealth]);
 
   useEffect(() => {
     let active = true;
@@ -306,9 +354,12 @@ export default function Dashboard() {
       setError("");
 
       try {
-        await loadFiles({
-          quiet: true,
-        });
+        await Promise.all([
+          loadFiles({
+            quiet: true,
+          }),
+          loadHealth(),
+        ]);
       } catch (
         requestError
       ) {
@@ -320,7 +371,10 @@ export default function Dashboard() {
       } finally {
         setRefreshing(false);
       }
-    }, [loadFiles]);
+    }, [
+      loadFiles,
+      loadHealth,
+    ]);
 
   const handleUploaded =
     useCallback(async () => {
@@ -439,6 +493,22 @@ export default function Dashboard() {
       ?.trim()
       ?.split(/\s+/)[0] ||
     "there";
+
+  const healthTopbarText =
+    healthStatus === "healthy"
+      ? "Blob Storage ready"
+      : healthStatus ===
+          "checking"
+        ? "Checking services"
+        : "Storage unavailable";
+
+  const healthShortText =
+    healthStatus === "healthy"
+      ? "Healthy"
+      : healthStatus ===
+          "checking"
+        ? "Checking"
+        : "Unavailable";
 
   if (loading) {
     return (
@@ -624,9 +694,12 @@ export default function Dashboard() {
           </div>
 
           <div className="az-topbar-actions">
-            <div className="az-system-status">
+            <div
+              className={`az-system-status ${healthStatus}`}
+            >
               <span />
-              Blob Storage ready
+
+              {healthTopbarText}
             </div>
 
             <button
@@ -829,9 +902,12 @@ export default function Dashboard() {
                 </span>
               </div>
 
-              <div className="az-storage-health">
+              <div
+                className={`az-storage-health ${healthStatus}`}
+              >
                 <span />
-                Healthy
+
+                {healthShortText}
               </div>
             </div>
 
@@ -1061,15 +1137,19 @@ export default function Dashboard() {
                 <span>
                   Name
                 </span>
+
                 <span>
                   Category
                 </span>
+
                 <span>
                   Size
                 </span>
+
                 <span>
                   Storage
                 </span>
+
                 <span>
                   Uploaded
                 </span>

@@ -861,3 +861,33 @@
     flex-direction: column;
   }
 }
+
+.azure-service-status.checking {
+  color: #9a603f;
+  border-color:
+    rgba(196, 81, 45, 0.18);
+  background:
+    rgba(196, 81, 45, 0.08);
+}
+
+.azure-service-status.checking > span {
+  background: #c46b43;
+  box-shadow:
+    0 0 0 4px
+    rgba(196, 81, 45, 0.1);
+}
+
+.azure-service-status.unhealthy {
+  color: #9b3434;
+  border-color:
+    rgba(155, 52, 52, 0.2);
+  background:
+    rgba(155, 52, 52, 0.08);
+}
+
+.azure-service-status.unhealthy > span {
+  background: #b54444;
+  box-shadow:
+    0 0 0 4px
+    rgba(181, 68, 68, 0.1);
+}

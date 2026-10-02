@@ -2,6 +2,7 @@ import {
   ArrowLeft,
   Boxes,
   CheckCircle2,
+  CircleAlert,
   Cloud,
   Database,
   FileText,
@@ -29,17 +30,28 @@ import api from "../api/client";
 import "./AzureStorage.css";
 
 function formatSize(bytes) {
-  const value = Number(bytes || 0);
+  const value =
+    Number(bytes || 0);
 
   if (value < 1024) {
     return `${value} B`;
   }
 
-  if (value < 1024 * 1024) {
-    return `${(value / 1024).toFixed(1)} KB`;
+  if (
+    value <
+    1024 * 1024
+  ) {
+    return `${(
+      value / 1024
+    ).toFixed(1)} KB`;
   }
 
-  if (value < 1024 * 1024 * 1024) {
+  if (
+    value <
+    1024 *
+      1024 *
+      1024
+  ) {
     return `${(
       value /
       (1024 * 1024)
@@ -48,12 +60,25 @@ function formatSize(bytes) {
 
   return `${(
     value /
-    (1024 * 1024 * 1024)
+    (1024 *
+      1024 *
+      1024)
   ).toFixed(1)} GB`;
 }
 
 function formatDate(value) {
   if (!value) {
+    return "—";
+  }
+
+  const date =
+    new Date(value);
+
+  if (
+    Number.isNaN(
+      date.getTime()
+    )
+  ) {
     return "—";
   }
 
@@ -63,11 +88,12 @@ function formatDate(value) {
       dateStyle: "medium",
       timeStyle: "short",
     }
-  ).format(new Date(value));
+  ).format(date);
 }
 
 export default function AzureStorage() {
-  const navigate = useNavigate();
+  const navigate =
+    useNavigate();
 
   const [
     files,
@@ -89,76 +115,179 @@ export default function AzureStorage() {
     setError,
   ] = useState("");
 
-  const loadStorage = useCallback(
-    async (manual = false) => {
-      if (manual) {
-        setRefreshing(true);
-      } else {
-        setLoading(true);
-      }
+  const [
+    healthStatus,
+    setHealthStatus,
+  ] = useState("checking");
 
-      setError("");
-
-      try {
-        const response =
-          await api.get("/api/files");
-
-        setFiles(
-          response.data?.data?.files ||
-            []
+  const loadHealth =
+    useCallback(
+      async () => {
+        setHealthStatus(
+          "checking"
         );
-      } catch (requestError) {
-        setError(
-          requestError.response?.data
-            ?.message ||
-            "Unable to load AzureDrop storage information."
-        );
-      } finally {
-        setLoading(false);
-        setRefreshing(false);
-      }
-    },
-    []
-  );
+
+        try {
+          const response =
+            await api.get(
+              "/health"
+            );
+
+          const data =
+            response.data;
+
+          const healthy =
+            data?.success === true &&
+            data?.status ===
+              "healthy" &&
+            data?.database ===
+              "healthy" &&
+            data?.storage ===
+              "healthy";
+
+          setHealthStatus(
+            healthy
+              ? "healthy"
+              : "unhealthy"
+          );
+        } catch {
+          setHealthStatus(
+            "unhealthy"
+          );
+        }
+      },
+      []
+    );
+
+  const loadStorage =
+    useCallback(
+      async (
+        manual = false
+      ) => {
+        if (manual) {
+          setRefreshing(
+            true
+          );
+        } else {
+          setLoading(
+            true
+          );
+        }
+
+        setError("");
+
+        try {
+          const [
+            response,
+          ] =
+            await Promise.all([
+              api.get(
+                "/api/files"
+              ),
+              loadHealth(),
+            ]);
+
+          setFiles(
+            response.data?.data
+              ?.files || []
+          );
+        } catch (
+          requestError
+        ) {
+          setError(
+            requestError.response
+              ?.data?.message ||
+              "Unable to load AzureDrop storage information."
+          );
+        } finally {
+          setLoading(false);
+          setRefreshing(
+            false
+          );
+        }
+      },
+      [loadHealth]
+    );
 
   useEffect(() => {
     loadStorage();
   }, [loadStorage]);
 
-  const totalSize = useMemo(
-    () =>
-      files.reduce(
-        (sum, file) =>
-          sum +
-          Number(
-            file.size_bytes || 0
-          ),
-        0
-      ),
-    [files]
-  );
+  const totalSize =
+    useMemo(
+      () =>
+        files.reduce(
+          (
+            sum,
+            file
+          ) =>
+            sum +
+            Number(
+              file.size_bytes ||
+                0
+            ),
+          0
+        ),
+      [files]
+    );
 
-  const recentFiles = useMemo(
-    () =>
-      [...files]
-        .sort(
-          (a, b) =>
-            new Date(
-              b.uploaded_at
-            ).getTime() -
-            new Date(
-              a.uploaded_at
-            ).getTime()
-        )
-        .slice(0, 5),
-    [files]
-  );
+  const recentFiles =
+    useMemo(
+      () =>
+        [...files]
+          .sort(
+            (
+              a,
+              b
+            ) =>
+              new Date(
+                b.uploaded_at
+              ).getTime() -
+              new Date(
+                a.uploaded_at
+              ).getTime()
+          )
+          .slice(
+            0,
+            5
+          ),
+      [files]
+    );
+
+  const healthTopbarText =
+    healthStatus ===
+    "healthy"
+      ? "Azure Blob ready"
+      : healthStatus ===
+          "checking"
+        ? "Checking services"
+        : "Storage unavailable";
+
+  const healthDetailText =
+    healthStatus ===
+    "healthy"
+      ? "Storage healthy"
+      : healthStatus ===
+          "checking"
+        ? "Checking storage"
+        : "Storage unavailable";
+
+  const providerIconClass =
+    healthStatus ===
+    "healthy"
+      ? "green"
+      : healthStatus ===
+          "checking"
+        ? "cream"
+        : "copper";
 
   if (loading) {
     return (
       <div className="azure-storage-loading">
         <div className="azure-loading-mark">
-          <Cloud size={28} />
+          <Cloud
+            size={28}
+          />
         </div>
 
         <strong>
@@ -166,8 +295,8 @@ export default function AzureStorage() {
         </strong>
 
         <span>
-          Connecting to your storage
-          workspace…
+          Connecting to your
+          storage workspace…
         </span>
       </div>
     );
@@ -179,16 +308,23 @@ export default function AzureStorage() {
         <div
           className="azure-storage-brand"
           onClick={() =>
-            navigate("/dashboard")
+            navigate(
+              "/dashboard"
+            )
           }
         >
           <div className="azure-brand-mark">
-            <Cloud size={22} />
+            <Cloud
+              size={22}
+            />
           </div>
 
           <div>
             <strong>
-              Azure<span>Drop</span>
+              Azure
+              <span>
+                Drop
+              </span>
             </strong>
 
             <small>
@@ -201,30 +337,42 @@ export default function AzureStorage() {
           <button
             type="button"
             onClick={() =>
-              navigate("/dashboard")
+              navigate(
+                "/dashboard"
+              )
             }
           >
-            <HardDrive size={18} />
+            <HardDrive
+              size={18}
+            />
             Overview
           </button>
 
           <button
             type="button"
             onClick={() =>
-              navigate("/dashboard")
+              navigate(
+                "/dashboard"
+              )
             }
           >
-            <FileText size={18} />
+            <FileText
+              size={18}
+            />
             Files
           </button>
 
           <button
             type="button"
             onClick={() =>
-              navigate("/shared")
+              navigate(
+                "/shared"
+              )
             }
           >
-            <Sparkles size={18} />
+            <Sparkles
+              size={18}
+            />
             Shared
           </button>
 
@@ -232,13 +380,17 @@ export default function AzureStorage() {
             className="active"
             type="button"
           >
-            <Boxes size={18} />
+            <Boxes
+              size={18}
+            />
             Storage
           </button>
         </nav>
 
         <div className="azure-sidebar-security">
-          <ShieldCheck size={19} />
+          <ShieldCheck
+            size={19}
+          />
 
           <div>
             <strong>
@@ -258,25 +410,36 @@ export default function AzureStorage() {
             className="azure-back-button"
             type="button"
             onClick={() =>
-              navigate("/dashboard")
+              navigate(
+                "/dashboard"
+              )
             }
           >
-            <ArrowLeft size={17} />
+            <ArrowLeft
+              size={17}
+            />
             Dashboard
           </button>
 
           <div className="azure-topbar-actions">
-            <div className="azure-service-status">
+            <div
+              className={`azure-service-status ${healthStatus}`}
+            >
               <span />
-              Azure Blob ready
+
+              {healthTopbarText}
             </div>
 
             <button
               className="azure-refresh-button"
               type="button"
-              disabled={refreshing}
+              disabled={
+                refreshing
+              }
               onClick={() =>
-                loadStorage(true)
+                loadStorage(
+                  true
+                )
               }
               aria-label="Refresh storage"
             >
@@ -297,7 +460,9 @@ export default function AzureStorage() {
 
           <div className="azure-storage-hero-copy">
             <div className="azure-storage-eyebrow">
-              <Cloud size={15} />
+              <Cloud
+                size={15}
+              />
               AZURE STORAGE
             </div>
 
@@ -310,12 +475,13 @@ export default function AzureStorage() {
             </h1>
 
             <p>
-              AzureDrop keeps your files
-              private in Azure Blob
-              Storage while PostgreSQL
-              maintains searchable file
-              metadata and controlled
-              sharing records.
+              AzureDrop keeps your
+              files private in Azure
+              Blob Storage while
+              PostgreSQL maintains
+              searchable file metadata
+              and controlled sharing
+              records.
             </p>
 
             <div className="azure-hero-actions">
@@ -323,16 +489,23 @@ export default function AzureStorage() {
                 className="azure-primary-button"
                 type="button"
                 onClick={() =>
-                  navigate("/dashboard")
+                  navigate(
+                    "/dashboard"
+                  )
                 }
               >
-                <UploadCloud size={18} />
+                <UploadCloud
+                  size={18}
+                />
                 Upload a file
               </button>
 
               <div className="azure-encryption-note">
-                <LockKeyhole size={16} />
-                Private container access
+                <LockKeyhole
+                  size={16}
+                />
+                Private container
+                access
               </div>
             </div>
           </div>
@@ -344,13 +517,16 @@ export default function AzureStorage() {
 
             <div className="azure-flow-item">
               <span className="azure-flow-icon">
-                <UploadCloud size={19} />
+                <UploadCloud
+                  size={19}
+                />
               </span>
 
               <div>
                 <strong>
                   AzureDrop API
                 </strong>
+
                 <small>
                   Authenticated uploads
                 </small>
@@ -361,13 +537,16 @@ export default function AzureStorage() {
 
             <div className="azure-flow-item">
               <span className="azure-flow-icon rust">
-                <Cloud size={19} />
+                <Cloud
+                  size={19}
+                />
               </span>
 
               <div>
                 <strong>
                   Azure Blob Storage
                 </strong>
+
                 <small>
                   Private file objects
                 </small>
@@ -378,13 +557,16 @@ export default function AzureStorage() {
 
             <div className="azure-flow-item">
               <span className="azure-flow-icon cream">
-                <Database size={19} />
+                <Database
+                  size={19}
+                />
               </span>
 
               <div>
                 <strong>
                   PostgreSQL
                 </strong>
+
                 <small>
                   Metadata & sharing
                 </small>
@@ -402,7 +584,9 @@ export default function AzureStorage() {
         <section className="azure-stat-grid">
           <article>
             <div className="azure-stat-icon">
-              <FileText size={21} />
+              <FileText
+                size={21}
+              />
             </div>
 
             <div>
@@ -422,7 +606,9 @@ export default function AzureStorage() {
 
           <article>
             <div className="azure-stat-icon copper">
-              <HardDrive size={21} />
+              <HardDrive
+                size={21}
+              />
             </div>
 
             <div>
@@ -431,7 +617,9 @@ export default function AzureStorage() {
               </span>
 
               <strong>
-                {formatSize(totalSize)}
+                {formatSize(
+                  totalSize
+                )}
               </strong>
 
               <small>
@@ -442,7 +630,9 @@ export default function AzureStorage() {
 
           <article>
             <div className="azure-stat-icon cream">
-              <Boxes size={21} />
+              <Boxes
+                size={21}
+              />
             </div>
 
             <div>
@@ -461,8 +651,25 @@ export default function AzureStorage() {
           </article>
 
           <article>
-            <div className="azure-stat-icon green">
-              <CheckCircle2 size={21} />
+            <div
+              className={`azure-stat-icon ${providerIconClass}`}
+            >
+              {healthStatus ===
+              "healthy" ? (
+                <CheckCircle2
+                  size={21}
+                />
+              ) : healthStatus ===
+                "checking" ? (
+                <RefreshCw
+                  size={21}
+                  className="spinning"
+                />
+              ) : (
+                <CircleAlert
+                  size={21}
+                />
+              )}
             </div>
 
             <div>
@@ -475,7 +682,9 @@ export default function AzureStorage() {
               </strong>
 
               <small>
-                Storage healthy
+                {
+                  healthDetailText
+                }
               </small>
             </div>
           </article>
@@ -497,7 +706,9 @@ export default function AzureStorage() {
               <button
                 type="button"
                 onClick={() =>
-                  navigate("/dashboard")
+                  navigate(
+                    "/dashboard"
+                  )
                 }
               >
                 View all
@@ -508,17 +719,20 @@ export default function AzureStorage() {
             0 ? (
               <div className="azure-empty-state">
                 <div>
-                  <UploadCloud size={26} />
+                  <UploadCloud
+                    size={26}
+                  />
                 </div>
 
                 <h3>
-                  Your storage is empty
+                  Your storage is
+                  empty
                 </h3>
 
                 <p>
-                  Upload your first file
-                  to populate Azure Blob
-                  Storage.
+                  Upload your first
+                  file to populate
+                  Azure Blob Storage.
                 </p>
 
                 <button
@@ -538,7 +752,9 @@ export default function AzureStorage() {
                   (file) => (
                     <div
                       className="azure-file-row"
-                      key={file.id}
+                      key={
+                        file.id
+                      }
                     >
                       <div className="azure-file-symbol">
                         <FileText
@@ -581,7 +797,9 @@ export default function AzureStorage() {
 
           <aside className="azure-security-panel">
             <div className="azure-security-icon">
-              <ShieldCheck size={24} />
+              <ShieldCheck
+                size={24}
+              />
             </div>
 
             <span>
@@ -593,11 +811,13 @@ export default function AzureStorage() {
             </h2>
 
             <p>
-              AzureDrop does not expose
-              blobs publicly. Downloads
-              use short-lived signed
-              access URLs generated only
-              after authorization.
+              AzureDrop does not
+              expose blobs publicly.
+              Downloads use
+              short-lived signed
+              access URLs generated
+              only after
+              authorization.
             </p>
 
             <ul>
@@ -612,14 +832,16 @@ export default function AzureStorage() {
                 <CheckCircle2
                   size={16}
                 />
-                Private Blob container
+                Private Blob
+                container
               </li>
 
               <li>
                 <CheckCircle2
                   size={16}
                 />
-                Temporary SAS downloads
+                Temporary SAS
+                downloads
               </li>
 
               <li>

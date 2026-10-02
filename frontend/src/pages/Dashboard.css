@@ -1094,3 +1094,28 @@
     align-items: flex-start;
   }
 }
+/* Dynamic AzureDrop service health states */
+
+.az-system-status.checking,
+.az-storage-health.checking {
+  color: #9a603f;
+  background:
+    rgba(196, 81, 45, 0.08);
+}
+
+.az-system-status.checking > span,
+.az-storage-health.checking > span {
+  background: #c46b43;
+}
+
+.az-system-status.unhealthy,
+.az-storage-health.unhealthy {
+  color: #9b3434;
+  background:
+    rgba(155, 52, 52, 0.09);
+}
+
+.az-system-status.unhealthy > span,
+.az-storage-health.unhealthy > span {
+  background: #b54444;
+}
