@@ -1,4 +1,8 @@
 import {
+  publicBaseUrl,
+} from "../config/env.js";
+
+import {
   createTemporaryShare,
   listFileShares,
   resolveShareToken,
@@ -23,10 +27,15 @@ export async function createShareController(
       });
 
     const baseUrl =
-      process.env.PUBLIC_BASE_URL ||
-      `${req.protocol}://${req.get(
-        "host"
-      )}`;
+      (
+        publicBaseUrl ||
+        `${req.protocol}://${req.get(
+          "host"
+        )}`
+      ).replace(
+        /\\\/$/,
+        ""
+      );
 
     const shareUrl =
       `${baseUrl}/api/share/${result.token}/download`;

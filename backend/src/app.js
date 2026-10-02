@@ -4,6 +4,10 @@ import helmet from "helmet";
 import morgan from "morgan";
 import multer from "multer";
 
+import {
+  corsOrigins,
+} from "./config/env.js";
+
 import healthRoutes from "./routes/health.routes.js";
 import authRoutes from "./routes/auth.routes.js";
 import fileRoutes from "./routes/file.routes.js";
@@ -24,7 +28,50 @@ app.use(
 );
 
 app.use(
-  cors()
+  cors({
+    origin(
+      origin,
+      callback
+    ) {
+      if (
+        !origin ||
+        corsOrigins.includes(
+          origin
+        )
+      ) {
+        return callback(
+          null,
+          true
+        );
+      }
+
+      const error =
+        new Error(
+          "Origin not allowed by CORS"
+        );
+
+      error.status =
+        403;
+
+      return callback(
+        error
+      );
+    },
+
+    methods: [
+      "GET",
+      "POST",
+      "PUT",
+      "PATCH",
+      "DELETE",
+      "OPTIONS",
+    ],
+
+    allowedHeaders: [
+      "Content-Type",
+      "Authorization",
+    ],
+  })
 );
 
 app.use(

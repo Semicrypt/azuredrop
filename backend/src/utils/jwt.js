@@ -1,18 +1,32 @@
 import jwt from "jsonwebtoken";
 
-export function generateToken(user) {
+import {
+  jwtExpiresIn,
+  jwtSecret,
+} from "../config/env.js";
+
+export function generateToken(
+  user
+) {
   return jwt.sign(
     {
       sub: user.id,
-      email: user.email,
+      email:
+        user.email,
     },
-    process.env.JWT_SECRET,
+    jwtSecret,
     {
-      expiresIn: process.env.JWT_EXPIRES_IN || "24h",
+      expiresIn:
+        jwtExpiresIn,
     }
   );
 }
 
-export function verifyToken(token) {
-  return jwt.verify(token, process.env.JWT_SECRET);
+export function verifyToken(
+  token
+) {
+  return jwt.verify(
+    token,
+    jwtSecret
+  );
 }

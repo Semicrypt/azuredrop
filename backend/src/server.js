@@ -1,10 +1,12 @@
 import "dotenv/config";
 
 import app from "./app.js";
+
 import pool from "./config/database.js";
 
-const PORT =
-  process.env.PORT || 5000;
+import {
+  port,
+} from "./config/env.js";
 
 async function startServer() {
   try {
@@ -18,19 +20,31 @@ async function startServer() {
 
     const server =
       app.listen(
-        PORT,
+        port,
         "0.0.0.0",
         () => {
           console.log(
-            `AzureDrop API running on port ${PORT}`
+            `AzureDrop API running on port ${port}`
           );
         }
       );
+
+    let shuttingDown =
+      false;
 
     const shutdown =
       async (
         signal
       ) => {
+        if (
+          shuttingDown
+        ) {
+          return;
+        }
+
+        shuttingDown =
+          true;
+
         console.log(
           `${signal} received. Shutting down...`
         );
