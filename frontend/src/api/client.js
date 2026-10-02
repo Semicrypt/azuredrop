@@ -1,9 +1,16 @@
 import axios from "axios";
 
+const apiBaseUrl =
+  import.meta.env.VITE_API_BASE_URL;
+
+if (!apiBaseUrl) {
+  throw new Error(
+    "VITE_API_BASE_URL is not configured."
+  );
+}
+
 const api = axios.create({
-  baseURL:
-    import.meta.env.VITE_API_BASE_URL ||
-    "http://localhost:5000",
+  baseURL: apiBaseUrl,
 });
 
 api.interceptors.request.use(
@@ -20,6 +27,7 @@ api.interceptors.request.use(
 
     return config;
   },
+
   (error) =>
     Promise.reject(error)
 );

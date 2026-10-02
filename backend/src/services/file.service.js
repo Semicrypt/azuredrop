@@ -176,6 +176,9 @@ export async function createFileDownloadUrl({
 
       expiresIn:
         300,
+
+      downloadName:
+        file.original_name,
     });
 
   return {

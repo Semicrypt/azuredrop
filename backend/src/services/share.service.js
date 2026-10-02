@@ -204,6 +204,9 @@ export async function resolveShareToken(
 
       expiresIn:
         300,
+
+      downloadName:
+        share.original_name,
     });
 
   return {
