@@ -9,12 +9,23 @@ import authRoutes from "./routes/auth.routes.js";
 import fileRoutes from "./routes/file.routes.js";
 import shareRoutes from "./routes/share.routes.js";
 
+import {
+  MAX_FILE_SIZE_MB,
+} from "./middleware/upload.middleware.js";
+
 const app = express();
 
-app.disable("x-powered-by");
+app.disable(
+  "x-powered-by"
+);
 
-app.use(helmet());
-app.use(cors());
+app.use(
+  helmet()
+);
+
+app.use(
+  cors()
+);
 
 app.use(
   express.json({
@@ -29,89 +40,201 @@ app.use(
   })
 );
 
-app.use(morgan("combined"));
+app.use(
+  morgan(
+    "combined"
+  )
+);
 
-app.get("/", (req, res) => {
-  return res.status(200).json({
-    success: true,
-    name: "AzureDrop API",
-    description: "Secure Azure File Storage Platform",
-    version: "1.0.0",
-  });
-});
+app.get(
+  "/",
+  (req, res) => {
+    return res
+      .status(200)
+      .json({
+        success: true,
 
-app.use("/health", healthRoutes);
-app.use("/api/auth", authRoutes);
-app.use("/api/files", fileRoutes);
-app.use("/api/share", shareRoutes);
+        name:
+          "AzureDrop API",
 
-app.use((req, res) => {
-  return res.status(404).json({
-    success: false,
-    message: "Route not found",
-  });
-});
+        description:
+          "Secure Azure File Storage Platform",
 
-app.use((error, req, res, next) => {
-  if (!error.status || error.status >= 500) {
-    console.error(error);
-  }
-
-  if (error.name === "ZodError") {
-    return res.status(400).json({
-      success: false,
-      message: "Validation failed",
-      errors: error.issues.map((issue) => ({
-        field: issue.path.join("."),
-        message: issue.message,
-      })),
-    });
-  }
-
-  if (error instanceof multer.MulterError) {
-    if (error.code === "LIMIT_FILE_SIZE") {
-      return res.status(413).json({
-        success: false,
-        message: `File exceeds the maximum allowed size of ${
-          process.env.MAX_FILE_SIZE_MB || 10
-        } MB`,
+        version:
+          "1.0.0",
       });
+  }
+);
+
+app.use(
+  "/health",
+  healthRoutes
+);
+
+app.use(
+  "/api/auth",
+  authRoutes
+);
+
+app.use(
+  "/api/files",
+  fileRoutes
+);
+
+app.use(
+  "/api/share",
+  shareRoutes
+);
+
+app.use(
+  (req, res) => {
+    return res
+      .status(404)
+      .json({
+        success: false,
+
+        message:
+          "Route not found",
+      });
+  }
+);
+
+app.use(
+  (
+    error,
+    req,
+    res,
+    next
+  ) => {
+    if (
+      !error.status ||
+      error.status >= 500
+    ) {
+      console.error(
+        error
+      );
     }
 
-    if (error.code === "LIMIT_FILE_COUNT") {
-      return res.status(400).json({
-        success: false,
-        message: "Only one file can be uploaded at a time",
-      });
+    if (
+      error.name ===
+      "ZodError"
+    ) {
+      return res
+        .status(400)
+        .json({
+          success:
+            false,
+
+          message:
+            "Validation failed",
+
+          errors:
+            error.issues.map(
+              (
+                issue
+              ) => ({
+                field:
+                  issue.path.join(
+                    "."
+                  ),
+
+                message:
+                  issue.message,
+              })
+            ),
+        });
     }
 
-    if (error.code === "LIMIT_UNEXPECTED_FILE") {
-      return res.status(400).json({
-        success: false,
-        message: "Unexpected file field",
-      });
+    if (
+      error instanceof
+      multer.MulterError
+    ) {
+      if (
+        error.code ===
+        "LIMIT_FILE_SIZE"
+      ) {
+        return res
+          .status(413)
+          .json({
+            success:
+              false,
+
+            message:
+              `File exceeds the maximum allowed size of ${MAX_FILE_SIZE_MB} MB`,
+          });
+      }
+
+      if (
+        error.code ===
+        "LIMIT_FILE_COUNT"
+      ) {
+        return res
+          .status(400)
+          .json({
+            success:
+              false,
+
+            message:
+              "Only one file can be uploaded at a time",
+          });
+      }
+
+      if (
+        error.code ===
+        "LIMIT_UNEXPECTED_FILE"
+      ) {
+        return res
+          .status(400)
+          .json({
+            success:
+              false,
+
+            message:
+              "Unexpected file field",
+          });
+      }
+
+      return res
+        .status(400)
+        .json({
+          success:
+            false,
+
+          message:
+            error.message,
+        });
     }
 
-    return res.status(400).json({
-      success: false,
-      message: error.message,
-    });
-  }
+    if (
+      error.status
+    ) {
+      return res
+        .status(
+          error.status
+        )
+        .json({
+          success:
+            false,
 
-  if (error.status) {
-    return res.status(error.status).json({
-      success: false,
-      message: error.message,
-    });
-  }
+          message:
+            error.message,
+        });
+    }
 
-  return res.status(500).json({
-    success: false,
-    message:
-      process.env.NODE_ENV === "production"
-        ? "Internal server error"
-        : error.message || "Internal server error",
-  });
-});
+    return res
+      .status(500)
+      .json({
+        success: false,
+
+        message:
+          process.env
+            .NODE_ENV ===
+          "production"
+            ? "Internal server error"
+            : error.message ||
+              "Internal server error",
+      });
+  }
+);
 
 export default app;
