@@ -10,7 +10,7 @@ api.interceptors.request.use(
   (config) => {
     const token =
       localStorage.getItem(
-        "clouddrop_token"
+        "azuredrop_token"
       );
 
     if (token) {
@@ -31,15 +31,15 @@ api.interceptors.response.use(
     if (
       error.response?.status === 401 &&
       localStorage.getItem(
-        "clouddrop_token"
+        "azuredrop_token"
       )
     ) {
       localStorage.removeItem(
-        "clouddrop_token"
+        "azuredrop_token"
       );
 
       localStorage.removeItem(
-        "clouddrop_user"
+        "azuredrop_user"
       );
     }
 

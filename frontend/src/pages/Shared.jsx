@@ -196,7 +196,7 @@ export default function Shared() {
     try {
       return JSON.parse(
         localStorage.getItem(
-          "clouddrop_user"
+          "azuredrop_user"
         )
       );
     } catch {
@@ -207,11 +207,11 @@ export default function Shared() {
   const logout =
     useCallback(() => {
       localStorage.removeItem(
-        "clouddrop_token"
+        "azuredrop_token"
       );
 
       localStorage.removeItem(
-        "clouddrop_user"
+        "azuredrop_user"
       );
 
       navigate(

@@ -60,17 +60,6 @@ export default function App() {
           }
         />
 
-        {/* Temporary compatibility redirect while old pages are migrated */}
-        <Route
-          path="/aws-storage"
-          element={
-            <Navigate
-              to="/storage"
-              replace
-            />
-          }
-        />
-
         <Route
           path="*"
           element={

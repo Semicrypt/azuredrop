@@ -146,13 +146,13 @@ export default function Register() {
        * frontend pages are migrated.
        */
       localStorage.setItem(
-        "clouddrop_token",
+        "azuredrop_token",
         token
       );
 
       if (user) {
         localStorage.setItem(
-          "clouddrop_user",
+          "azuredrop_user",
           JSON.stringify(
             user
           )
@@ -162,7 +162,7 @@ export default function Register() {
       /*
        * AzureDrop has one secure
        * Azure Blob storage workflow,
-       * so no AWS storage-choice
+       * so no separate storage-choice
        * onboarding is required.
        */
       navigate(

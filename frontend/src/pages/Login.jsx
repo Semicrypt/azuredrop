@@ -127,13 +127,13 @@ export default function Login() {
        * whole frontend in one migration.
        */
       localStorage.setItem(
-        "clouddrop_token",
+        "azuredrop_token",
         token
       );
 
       if (user) {
         localStorage.setItem(
-          "clouddrop_user",
+          "azuredrop_user",
           JSON.stringify(
             user
           )
