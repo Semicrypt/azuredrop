@@ -1,8 +1,4 @@
 import {
-  useState,
-} from "react";
-
-import {
   ArrowLeft,
   ArrowRight,
   Check,
@@ -10,6 +6,7 @@ import {
   Database,
   Eye,
   EyeOff,
+  FileText,
   LoaderCircle,
   Lock,
   Mail,
@@ -18,13 +15,17 @@ import {
 } from "lucide-react";
 
 import {
+  useState,
+} from "react";
+
+import {
   Link,
   useNavigate,
 } from "react-router-dom";
 
 import api from "../api/client";
 
-import "./Register.css";
+import "./Auth.css";
 
 export default function Register() {
   const navigate =
@@ -100,7 +101,8 @@ export default function Register() {
     }
 
     if (
-      form.password.length < 8
+      form.password.length <
+      8
     ) {
       setError(
         "Password must contain at least 8 characters."
@@ -138,6 +140,11 @@ export default function Register() {
         );
       }
 
+      /*
+       * Temporary compatibility keys.
+       * Rename globally after all
+       * frontend pages are migrated.
+       */
       localStorage.setItem(
         "clouddrop_token",
         token
@@ -153,18 +160,20 @@ export default function Register() {
       }
 
       /*
-       * New CloudDrop users choose
-       * Managed Storage or connect
-       * their own AWS account before
-       * continuing into the product.
+       * AzureDrop has one secure
+       * Azure Blob storage workflow,
+       * so no AWS storage-choice
+       * onboarding is required.
        */
       navigate(
-        "/aws-storage",
+        "/dashboard",
         {
           replace: true,
         }
       );
-    } catch (requestError) {
+    } catch (
+      requestError
+    ) {
       setError(
         requestError
           ?.response?.data
@@ -177,30 +186,32 @@ export default function Register() {
   }
 
   return (
-    <div className="register-page">
-      <div className="register-background-grid" />
-
-      <div className="register-glow register-glow-one" />
-
-      <div className="register-glow register-glow-two" />
-
-      <header className="register-header">
+    <div className="auth-page">
+      <header className="auth-header">
         <Link
-          className="register-brand"
+          className="auth-brand"
           to="/"
         >
-          <span>
-            <Cloud size={20} />
+          <span className="auth-brand-mark">
+            <Cloud size={21} />
           </span>
 
-          <strong>
-            Cloud
-            <em>Drop</em>
-          </strong>
+          <span className="auth-brand-copy">
+            <strong>
+              Azure
+              <em>
+                Drop
+              </em>
+            </strong>
+
+            <small>
+              Secure cloud storage
+            </small>
+          </span>
         </Link>
 
         <Link
-          className="register-back"
+          className="auth-back"
           to="/"
         >
           <ArrowLeft
@@ -211,35 +222,36 @@ export default function Register() {
         </Link>
       </header>
 
-      <main className="register-main">
-        <section className="register-showcase">
-          <div className="register-showcase-content">
-            <div className="register-kicker">
+      <main className="auth-layout">
+        <section className="auth-showcase">
+          <div className="auth-showcase-glow" />
+
+          <div className="auth-showcase-content">
+            <div className="auth-kicker">
               <ShieldCheck
                 size={15}
               />
 
-              Start securely
+              BUILT FOR PRIVACY
             </div>
 
             <h1>
-              Build your private
+              Your secure
               <span>
                 {" "}
-                cloud workspace.
+                Azure workspace.
               </span>
             </h1>
 
             <p>
-              Create your CloudDrop
-              account, choose your
-              preferred storage model,
-              then securely upload,
-              organize and share files
-              from one workspace.
+              Create your AzureDrop
+              account and start storing,
+              organizing and sharing
+              files through a secure
+              Azure-native workflow.
             </p>
 
-            <div className="register-benefits">
+            <div className="auth-benefits">
               <div>
                 <span>
                   <Check
@@ -249,13 +261,13 @@ export default function Register() {
 
                 <div>
                   <strong>
-                    Choose your storage
+                    Azure Blob Storage
                   </strong>
 
                   <small>
-                    Start with managed
-                    storage or connect
-                    your own AWS account.
+                    Uploads are stored
+                    in a private Blob
+                    container.
                   </small>
                 </div>
               </div>
@@ -269,13 +281,14 @@ export default function Register() {
 
                 <div>
                   <strong>
-                    Secure AWS access
+                    PostgreSQL metadata
                   </strong>
 
                   <small>
-                    Cross-account IAM
-                    roles and temporary
-                    STS credentials.
+                    Searchable metadata,
+                    categories and share
+                    records stay
+                    organized.
                   </small>
                 </div>
               </div>
@@ -289,77 +302,73 @@ export default function Register() {
 
                 <div>
                   <strong>
-                    Multi-bucket control
+                    Secure sharing
                   </strong>
 
                   <small>
-                    Create buckets,
-                    select defaults and
-                    manage versioning.
+                    Generate expiring
+                    links without
+                    exposing containers
+                    publicly.
                   </small>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="register-storage-visual">
-            <div className="register-storage-ring ring-one" />
+          <div className="auth-cloud-visual">
+            <div className="auth-orbit orbit-one" />
+            <div className="auth-orbit orbit-two" />
 
-            <div className="register-storage-ring ring-two" />
-
-            <div className="register-storage-core">
-              <Cloud
-                size={34}
-              />
+            <div className="auth-cloud-core">
+              <Cloud size={35} />
 
               <strong>
-                CloudDrop
+                AzureDrop
               </strong>
 
               <span>
-                Storage
+                Ready
               </span>
             </div>
 
-            <div className="register-storage-chip managed">
-              <Cloud
-                size={15}
-              />
-
-              Managed
+            <div className="auth-service-chip blob">
+              <Cloud size={15} />
+              Blob Storage
             </div>
 
-            <div className="register-storage-chip aws">
-              <Database
-                size={15}
-              />
+            <div className="auth-service-chip postgres">
+              <Database size={15} />
+              PostgreSQL
+            </div>
 
-              My AWS
+            <div className="auth-service-chip files">
+              <FileText size={15} />
+              File sharing
             </div>
           </div>
         </section>
 
-        <section className="register-form-section">
-          <div className="register-form-card">
-            <div className="register-form-heading">
+        <section className="auth-form-section">
+          <div className="auth-form-card">
+            <div className="auth-form-heading">
               <span>
-                Create account
+                GET STARTED
               </span>
 
               <h2>
-                Start your workspace
+                Create your account
               </h2>
 
               <p>
-                Your storage choice
-                comes immediately after
-                registration.
+                Set up your AzureDrop
+                workspace in seconds.
               </p>
             </div>
 
             {error && (
               <div
-                className="register-error"
+                className="auth-error"
                 role="alert"
               >
                 <ShieldCheck
@@ -373,7 +382,7 @@ export default function Register() {
             )}
 
             <form
-              className="register-form"
+              className="auth-form"
               onSubmit={
                 handleSubmit
               }
@@ -383,7 +392,7 @@ export default function Register() {
                   Full name
                 </span>
 
-                <div className="register-input-wrap">
+                <div className="auth-input-wrap">
                   <User
                     size={17}
                   />
@@ -412,7 +421,7 @@ export default function Register() {
                   Email address
                 </span>
 
-                <div className="register-input-wrap">
+                <div className="auth-input-wrap">
                   <Mail
                     size={17}
                   />
@@ -441,7 +450,7 @@ export default function Register() {
                   Password
                 </span>
 
-                <div className="register-input-wrap">
+                <div className="auth-input-wrap">
                   <Lock
                     size={17}
                   />
@@ -469,7 +478,7 @@ export default function Register() {
                   />
 
                   <button
-                    className="register-password-toggle"
+                    className="auth-password-toggle"
                     type="button"
                     aria-label={
                       showPassword
@@ -498,14 +507,13 @@ export default function Register() {
                   </button>
                 </div>
 
-                <small className="register-password-help">
-                  Use at least 8
-                  characters.
+                <small className="auth-field-help">
+                  Minimum 8 characters.
                 </small>
               </label>
 
               <button
-                className="register-submit"
+                className="auth-submit"
                 type="submit"
                 disabled={
                   loading
@@ -515,7 +523,7 @@ export default function Register() {
                   <>
                     <LoaderCircle
                       size={18}
-                      className="register-spin"
+                      className="auth-spin"
                     />
 
                     Creating account…
@@ -532,37 +540,34 @@ export default function Register() {
               </button>
             </form>
 
-            <div className="register-next-step">
-              <div className="register-next-step-icon">
-                <Database
-                  size={18}
-                />
-              </div>
+            <div className="auth-next-step">
+              <span>
+                <Cloud size={18} />
+              </span>
 
               <div>
                 <strong>
-                  Next: choose storage
+                  Azure storage ready
                 </strong>
 
                 <p>
-                  After registration,
-                  choose CloudDrop
-                  Managed Storage or
-                  securely connect your
-                  AWS account.
+                  After registration
+                  you’ll enter your
+                  dashboard with the
+                  secure Blob workflow
+                  already configured.
                 </p>
               </div>
             </div>
 
-            <div className="register-divider">
+            <div className="auth-divider">
               <span>
-                Already have an
-                account?
+                Already registered?
               </span>
             </div>
 
             <Link
-              className="register-signin"
+              className="auth-secondary-action"
               to="/login"
             >
               Sign in instead
@@ -572,30 +577,30 @@ export default function Register() {
               />
             </Link>
 
-            <div className="register-security-note">
+            <div className="auth-security-note">
               <Lock
                 size={14}
               />
 
               <p>
-                Connecting AWS never
-                requires you to store
-                an AWS access key or
-                secret access key in
-                CloudDrop.
+                Files remain private
+                and are accessed through
+                authenticated or
+                temporary signed
+                requests.
               </p>
             </div>
           </div>
         </section>
       </main>
 
-      <footer className="register-footer">
+      <footer className="auth-footer">
         <span>
-          © 2026 CloudDrop
+          © 2026 AzureDrop
         </span>
 
         <span>
-          Secure cloud file storage
+          Secure Azure file storage
         </span>
       </footer>
     </div>

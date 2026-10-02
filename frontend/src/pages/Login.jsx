@@ -1,19 +1,21 @@
 import {
-  useState,
-} from "react";
-
-import {
   ArrowLeft,
   ArrowRight,
   Check,
   Cloud,
+  Database,
   Eye,
   EyeOff,
+  FileText,
   LoaderCircle,
   Lock,
   Mail,
   ShieldCheck,
 } from "lucide-react";
+
+import {
+  useState,
+} from "react";
 
 import {
   Link,
@@ -22,7 +24,7 @@ import {
 
 import api from "../api/client";
 
-import "./Login.css";
+import "./Auth.css";
 
 export default function Login() {
   const navigate =
@@ -119,6 +121,11 @@ export default function Login() {
         );
       }
 
+      /*
+       * Temporary compatibility keys.
+       * These will be renamed across the
+       * whole frontend in one migration.
+       */
       localStorage.setItem(
         "clouddrop_token",
         token
@@ -139,7 +146,9 @@ export default function Login() {
           replace: true,
         }
       );
-    } catch (requestError) {
+    } catch (
+      requestError
+    ) {
       setError(
         requestError
           ?.response?.data
@@ -152,33 +161,32 @@ export default function Login() {
   }
 
   return (
-    <div className="login-page">
-      <div className="login-background-grid" />
-
-      <div className="login-glow login-glow-one" />
-      <div className="login-glow login-glow-two" />
-
-      <header className="login-header">
+    <div className="auth-page">
+      <header className="auth-header">
         <Link
-          className="login-brand"
+          className="auth-brand"
           to="/"
         >
-          <span>
-            <Cloud
-              size={20}
-            />
+          <span className="auth-brand-mark">
+            <Cloud size={21} />
           </span>
 
-          <strong>
-            Cloud
-            <em>
-              Drop
-            </em>
-          </strong>
+          <span className="auth-brand-copy">
+            <strong>
+              Azure
+              <em>
+                Drop
+              </em>
+            </strong>
+
+            <small>
+              Secure cloud storage
+            </small>
+          </span>
         </Link>
 
         <Link
-          className="login-back"
+          className="auth-back"
           to="/"
         >
           <ArrowLeft
@@ -189,36 +197,36 @@ export default function Login() {
         </Link>
       </header>
 
-      <main className="login-main">
-        <section className="login-showcase">
-          <div className="login-showcase-content">
-            <div className="login-kicker">
+      <main className="auth-layout">
+        <section className="auth-showcase">
+          <div className="auth-showcase-glow" />
+
+          <div className="auth-showcase-content">
+            <div className="auth-kicker">
               <ShieldCheck
                 size={15}
               />
 
-              Secure cloud
-              workspace
+              SECURE WORKSPACE
             </div>
 
             <h1>
               Welcome back to
               <span>
                 {" "}
-                CloudDrop.
+                AzureDrop.
               </span>
             </h1>
 
             <p>
-              Access your files,
-              storage configuration,
-              temporary shares and
-              connected AWS
-              infrastructure from one
-              secure workspace.
+              Manage private files,
+              metadata and temporary
+              sharing from one secure
+              cloud workspace backed by
+              Azure Blob Storage.
             </p>
 
-            <div className="login-benefits">
+            <div className="auth-benefits">
               <div>
                 <span>
                   <Check
@@ -228,13 +236,14 @@ export default function Login() {
 
                 <div>
                   <strong>
-                    Private file
-                    storage
+                    Private Blob storage
                   </strong>
 
                   <small>
-                    Secure uploads and
-                    signed downloads.
+                    Files remain private
+                    and downloads use
+                    temporary signed
+                    access.
                   </small>
                 </div>
               </div>
@@ -248,13 +257,14 @@ export default function Login() {
 
                 <div>
                   <strong>
-                    AWS integration
+                    Searchable metadata
                   </strong>
 
                   <small>
-                    Cross-account IAM
-                    with temporary STS
-                    credentials.
+                    PostgreSQL tracks
+                    file metadata,
+                    categories and
+                    sharing records.
                   </small>
                 </div>
               </div>
@@ -268,77 +278,72 @@ export default function Login() {
 
                 <div>
                   <strong>
-                    Multi-bucket
-                    control
+                    Expiring shares
                   </strong>
 
                   <small>
-                    Choose default
-                    storage, versioning
-                    and bucket actions.
+                    Share files safely
+                    without making Blob
+                    objects public.
                   </small>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="login-security-visual">
-            <div className="login-security-ring ring-one" />
-            <div className="login-security-ring ring-two" />
+          <div className="auth-cloud-visual">
+            <div className="auth-orbit orbit-one" />
+            <div className="auth-orbit orbit-two" />
 
-            <div className="login-security-core">
-              <ShieldCheck
-                size={35}
-              />
+            <div className="auth-cloud-core">
+              <Cloud size={35} />
 
               <strong>
-                Protected
+                AzureDrop
               </strong>
 
               <span>
-                CloudDrop
+                Protected
               </span>
             </div>
 
-            <div className="login-security-chip chip-left">
-              <Lock
-                size={15}
-              />
-
-              Private storage
+            <div className="auth-service-chip blob">
+              <Cloud size={15} />
+              Azure Blob
             </div>
 
-            <div className="login-security-chip chip-right">
-              <Cloud
-                size={15}
-              />
+            <div className="auth-service-chip postgres">
+              <Database size={15} />
+              PostgreSQL
+            </div>
 
-              AWS connected
+            <div className="auth-service-chip files">
+              <FileText size={15} />
+              Secure files
             </div>
           </div>
         </section>
 
-        <section className="login-form-section">
-          <div className="login-form-card">
-            <div className="login-form-heading">
+        <section className="auth-form-section">
+          <div className="auth-form-card">
+            <div className="auth-form-heading">
               <span>
-                Sign in
+                SIGN IN
               </span>
 
               <h2>
-                Access your
-                workspace
+                Access your workspace
               </h2>
 
               <p>
-                Enter your CloudDrop
+                Enter your AzureDrop
                 account credentials.
               </p>
             </div>
 
             {error && (
               <div
-                className="login-error"
+                className="auth-error"
                 role="alert"
               >
                 <ShieldCheck
@@ -352,7 +357,7 @@ export default function Login() {
             )}
 
             <form
-              className="login-form"
+              className="auth-form"
               onSubmit={
                 handleSubmit
               }
@@ -362,7 +367,7 @@ export default function Login() {
                   Email address
                 </span>
 
-                <div className="login-input-wrap">
+                <div className="auth-input-wrap">
                   <Mail
                     size={17}
                   />
@@ -391,7 +396,7 @@ export default function Login() {
                   Password
                 </span>
 
-                <div className="login-input-wrap">
+                <div className="auth-input-wrap">
                   <Lock
                     size={17}
                   />
@@ -418,7 +423,7 @@ export default function Login() {
                   />
 
                   <button
-                    className="login-password-toggle"
+                    className="auth-password-toggle"
                     type="button"
                     aria-label={
                       showPassword
@@ -449,7 +454,7 @@ export default function Login() {
               </label>
 
               <button
-                className="login-submit"
+                className="auth-submit"
                 type="submit"
                 disabled={
                   loading
@@ -459,7 +464,7 @@ export default function Login() {
                   <>
                     <LoaderCircle
                       size={18}
-                      className="login-spin"
+                      className="auth-spin"
                     />
 
                     Signing in…
@@ -476,14 +481,14 @@ export default function Login() {
               </button>
             </form>
 
-            <div className="login-divider">
+            <div className="auth-divider">
               <span>
-                New to CloudDrop?
+                New to AzureDrop?
               </span>
             </div>
 
             <Link
-              className="login-create-account"
+              className="auth-secondary-action"
               to="/register"
             >
               Create an account
@@ -493,30 +498,30 @@ export default function Login() {
               />
             </Link>
 
-            <div className="login-security-note">
+            <div className="auth-security-note">
               <Lock
                 size={14}
               />
 
               <p>
-                CloudDrop never asks
-                you to enter AWS
-                access keys or secret
-                keys when connecting
-                your AWS account.
+                Your files remain
+                private. Temporary
+                signed URLs are created
+                only when authorized
+                access is requested.
               </p>
             </div>
           </div>
         </section>
       </main>
 
-      <footer className="login-footer">
+      <footer className="auth-footer">
         <span>
-          © 2026 CloudDrop
+          © 2026 AzureDrop
         </span>
 
         <span>
-          Secure cloud file storage
+          Secure Azure file storage
         </span>
       </footer>
     </div>
