@@ -1,12 +1,11 @@
 import {
+  Boxes,
   ChevronRight,
   Clock,
   Cloud,
-  Database,
   ExternalLink,
   FileText,
   Files,
-  HardDrive,
   Link2,
   LogOut,
   Menu,
@@ -15,7 +14,6 @@ import {
   Share2,
   ShieldCheck,
   Trash2,
-  UploadCloud,
   X,
 } from "lucide-react";
 
@@ -31,7 +29,6 @@ import {
 } from "react-router-dom";
 
 import api from "../api/client";
-
 import FileDetailsModal from "../components/FileDetailsModal";
 
 import "./Shared.css";
@@ -41,8 +38,7 @@ function formatDate(value) {
     return "Unknown";
   }
 
-  const date =
-    new Date(value);
+  const date = new Date(value);
 
   if (
     Number.isNaN(
@@ -63,8 +59,7 @@ function getTimeRemaining(value) {
   const expiry =
     new Date(value).getTime();
 
-  const now =
-    Date.now();
+  const now = Date.now();
 
   if (
     Number.isNaN(expiry)
@@ -114,9 +109,7 @@ function getTimeRemaining(value) {
   } remaining`;
 }
 
-function isExpired(
-  share
-) {
+function isExpired(share) {
   if (!share?.expires_at) {
     return false;
   }
@@ -144,30 +137,9 @@ function isExpiringSoon(
       share.expires_at
     ).getTime();
 
-  const difference =
-    expiry - Date.now();
-
   return (
-    difference <=
-    24 *
-      60 *
-      60 *
-      1000
-  );
-}
-
-function SharedBrand() {
-  return (
-    <div className="shared-brand">
-      <span className="shared-brand-mark">
-        <Cloud size={19} />
-      </span>
-
-      <strong>
-        Cloud
-        <em>Drop</em>
-      </strong>
-    </div>
+    expiry - Date.now() <=
+    24 * 60 * 60 * 1000
   );
 }
 
@@ -208,9 +180,7 @@ export default function Shared() {
   const [
     filter,
     setFilter,
-  ] = useState(
-    "active"
-  );
+  ] = useState("active");
 
   const [
     selectedFile,
@@ -264,18 +234,14 @@ export default function Shared() {
           ?.data?.data
           ?.files || [];
 
-      if (
-        files.length === 0
-      ) {
+      if (!files.length) {
         return [];
       }
 
       const results =
         await Promise.allSettled(
           files.map(
-            async (
-              file
-            ) => {
+            async (file) => {
               const response =
                 await api.get(
                   `/api/files/${file.id}/shares`
@@ -283,10 +249,8 @@ export default function Shared() {
 
               const shares =
                 response
-                  ?.data
-                  ?.data
-                  ?.shares ||
-                [];
+                  ?.data?.data
+                  ?.shares || [];
 
               return shares.map(
                 (share) => ({
@@ -309,10 +273,7 @@ export default function Shared() {
             result.value
         )
         .sort(
-          (
-            first,
-            second
-          ) =>
+          (first, second) =>
             new Date(
               first.expires_at ||
                 0
@@ -337,20 +298,16 @@ export default function Shared() {
           const items =
             await fetchSharedItems();
 
-          setSharedItems(
-            items
-          );
+          setSharedItems(items);
         } catch (
           requestError
         ) {
           if (
             requestError
               ?.response
-              ?.status ===
-            401
+              ?.status === 401
           ) {
             logout();
-
             return;
           }
 
@@ -372,9 +329,7 @@ export default function Shared() {
           await fetchSharedItems();
 
         if (active) {
-          setSharedItems(
-            items
-          );
+          setSharedItems(items);
         }
       } catch (
         requestError
@@ -385,7 +340,6 @@ export default function Shared() {
             ?.status === 401
         ) {
           logout();
-
           return;
         }
 
@@ -400,9 +354,7 @@ export default function Shared() {
         }
       } finally {
         if (active) {
-          setLoading(
-            false
-          );
+          setLoading(false);
         }
       }
     }
@@ -478,9 +430,7 @@ export default function Shared() {
           "Unable to revoke this share link."
       );
     } finally {
-      setRevokingId(
-        ""
-      );
+      setRevokingId("");
     }
   }
 
@@ -489,9 +439,7 @@ export default function Shared() {
       () =>
         sharedItems.filter(
           (item) =>
-            !isExpired(
-              item
-            )
+            !isExpired(item)
         ),
       [sharedItems]
     );
@@ -500,10 +448,7 @@ export default function Shared() {
     useMemo(
       () =>
         sharedItems.filter(
-          (item) =>
-            isExpired(
-              item
-            )
+          isExpired
         ),
       [sharedItems]
     );
@@ -539,19 +484,20 @@ export default function Shared() {
       return sharedItems.filter(
         (item) => {
           const expired =
-            isExpired(
-              item
-            );
+            isExpired(item);
 
           const matchesFilter =
-            filter ===
-              "all" ||
-            (filter ===
-              "active" &&
-              !expired) ||
-            (filter ===
-              "expired" &&
-              expired);
+            filter === "all" ||
+            (
+              filter ===
+                "active" &&
+              !expired
+            ) ||
+            (
+              filter ===
+                "expired" &&
+              expired
+            );
 
           const matchesSearch =
             !term ||
@@ -561,9 +507,7 @@ export default function Shared() {
                 ""
             )
               .toLowerCase()
-              .includes(
-                term
-              );
+              .includes(term);
 
           return (
             matchesFilter &&
@@ -577,57 +521,59 @@ export default function Shared() {
       filter,
     ]);
 
-  function closeSidebar() {
-    setMobileSidebarOpen(
-      false
-    );
-  }
-
-  function goTo(
-    destination
-  ) {
-    closeSidebar();
-
-    navigate(
-      destination
-    );
-  }
+  const firstName =
+    user?.name
+      ?.trim()
+      ?.split(/\s+/)[0] ||
+    "User";
 
   return (
-    <main className="shared-page">
+    <main className="az-shared-page">
       <aside
-        className={`shared-sidebar ${
+        className={`az-shared-sidebar ${
           mobileSidebarOpen
-            ? "mobile-open"
+            ? "open"
             : ""
         }`}
       >
         <div>
-          <div className="shared-sidebar-top">
-            <SharedBrand />
-
-            <button
-              className="shared-sidebar-close"
-              type="button"
-              aria-label="Close navigation"
-              onClick={
-                closeSidebar
-              }
-            >
-              <X size={19} />
-            </button>
-          </div>
-
-          <nav className="shared-sidebar-nav">
-            <span className="shared-nav-label">
-              Workspace
+          <div className="az-shared-brand">
+            <span>
+              <Cloud size={21} />
             </span>
 
+            <div>
+              <strong>
+                Azure
+                <em>
+                  Drop
+                </em>
+              </strong>
+
+              <small>
+                Cloud workspace
+              </small>
+            </div>
+          </div>
+
+          <button
+            className="az-shared-close"
+            type="button"
+            aria-label="Close navigation"
+            onClick={() =>
+              setMobileSidebarOpen(
+                false
+              )
+            }
+          >
+            <X size={19} />
+          </button>
+
+          <nav>
             <button
-              className="shared-nav-link"
               type="button"
               onClick={() =>
-                goTo(
+                navigate(
                   "/dashboard"
                 )
               }
@@ -636,43 +582,16 @@ export default function Shared() {
                 size={18}
               />
 
-              <span>
-                My Files
-              </span>
+              Files
             </button>
 
             <button
-              className="shared-nav-link"
+              className="active"
               type="button"
-              onClick={() =>
-                goTo(
-                  "/dashboard"
-                )
-              }
             >
-              <UploadCloud
-                size={18}
-              />
+              <Share2 size={18} />
 
-              <span>
-                Upload
-              </span>
-            </button>
-
-            <button
-              className="shared-nav-link active"
-              type="button"
-              onClick={
-                closeSidebar
-              }
-            >
-              <Share2
-                size={18}
-              />
-
-              <span>
-                Shared
-              </span>
+              Shared
 
               {activeItems.length >
                 0 && (
@@ -684,107 +603,74 @@ export default function Shared() {
               )}
             </button>
 
-            <span className="shared-nav-label shared-storage-label">
+            <button
+              type="button"
+              onClick={() =>
+                navigate(
+                  "/storage"
+                )
+              }
+            >
+              <Boxes size={18} />
+
               Storage
-            </span>
-
-            <button
-              className="shared-nav-link"
-              type="button"
-              onClick={() =>
-                goTo(
-                  "/aws-storage"
-                )
-              }
-            >
-              <HardDrive
-                size={18}
-              />
-
-              <span>
-                CloudDrop Storage
-              </span>
-            </button>
-
-            <button
-              className="shared-nav-link shared-sub-link"
-              type="button"
-              onClick={() =>
-                goTo(
-                  "/aws-storage"
-                )
-              }
-            >
-              <Database
-                size={16}
-              />
-
-              <span>
-                My AWS
-              </span>
             </button>
           </nav>
         </div>
 
-        <div className="shared-sidebar-bottom">
-          <div className="shared-user-mini">
+        <div className="az-shared-sidebar-bottom">
+          <div className="az-shared-user">
             <span>
-              {user?.name
-                ?.trim()
-                ?.charAt(0)
-                ?.toUpperCase() ||
-                "U"}
+              {firstName
+                .charAt(0)
+                .toUpperCase()}
             </span>
 
             <div>
               <strong>
                 {user?.name ||
-                  "CloudDrop User"}
+                  "AzureDrop User"}
               </strong>
 
               <small>
-                {user?.email ||
-                  ""}
+                {user?.email || ""}
               </small>
             </div>
           </div>
 
           <button
-            className="shared-nav-link shared-logout-link"
+            className="az-shared-logout"
             type="button"
-            onClick={
-              logout
-            }
+            onClick={logout}
           >
-            <LogOut
-              size={18}
-            />
-
-            <span>
-              Sign out
-            </span>
+            <LogOut size={17} />
+            Sign out
           </button>
         </div>
       </aside>
 
       {mobileSidebarOpen && (
         <button
-          className="shared-sidebar-backdrop"
+          className="az-shared-overlay"
           type="button"
           aria-label="Close navigation"
-          onClick={
-            closeSidebar
+          onClick={() =>
+            setMobileSidebarOpen(
+              false
+            )
           }
         />
       )}
 
-      <section className="shared-content">
-        <header className="shared-mobile-header">
-          <SharedBrand />
+      <section className="az-shared-content">
+        <header className="az-shared-mobile-header">
+          <div className="az-shared-mobile-brand">
+            <Cloud size={20} />
+            AzureDrop
+          </div>
 
           <button
             type="button"
-            aria-label="Open navigation"
             onClick={() =>
               setMobileSidebarOpen(
                 true
@@ -795,11 +681,11 @@ export default function Shared() {
           </button>
         </header>
 
-        <div className="shared-content-inner">
-          <header className="shared-header">
+        <div className="az-shared-inner">
+          <header className="az-shared-header">
             <div>
-              <span className="shared-eyebrow">
-                Temporary sharing
+              <span>
+                SECURE SHARING
               </span>
 
               <h1>
@@ -807,22 +693,18 @@ export default function Shared() {
               </h1>
 
               <p>
-                Review active public
-                links, expiration
-                times and access
-                controls from one
-                place.
+                Manage active and
+                expired temporary file
+                links from one secure
+                workspace.
               </p>
             </div>
 
-            <div className="shared-header-actions">
+            <div className="az-shared-header-actions">
               <button
-                className="shared-refresh-button"
+                className="refresh"
                 type="button"
-                aria-label="Refresh shared links"
-                disabled={
-                  refreshing
-                }
+                disabled={refreshing}
                 onClick={
                   refreshSharedItems
                 }
@@ -831,14 +713,14 @@ export default function Shared() {
                   size={17}
                   className={
                     refreshing
-                      ? "shared-spin"
+                      ? "az-shared-spin"
                       : ""
                   }
                 />
               </button>
 
               <button
-                className="shared-primary-button"
+                className="primary"
                 type="button"
                 onClick={() =>
                   navigate(
@@ -846,17 +728,14 @@ export default function Shared() {
                   )
                 }
               >
-                <Files
-                  size={17}
-                />
-
-                My Files
+                <Files size={17} />
+                My files
               </button>
             </div>
           </header>
 
           {error && (
-            <div className="shared-error-banner">
+            <div className="az-shared-error">
               <ShieldCheck
                 size={17}
               />
@@ -867,22 +746,19 @@ export default function Shared() {
 
               <button
                 type="button"
-                aria-label="Dismiss error"
                 onClick={() =>
                   setError("")
                 }
               >
-                <X size={15} />
+                <X size={14} />
               </button>
             </div>
           )}
 
-          <section className="shared-stats-grid">
+          <section className="az-shared-stats">
             <article>
-              <div className="shared-stat-icon blue">
-                <Link2
-                  size={20}
-                />
+              <div className="rust">
+                <Link2 size={20} />
               </div>
 
               <span>
@@ -890,9 +766,7 @@ export default function Shared() {
               </span>
 
               <strong>
-                {
-                  activeItems.length
-                }
+                {activeItems.length}
               </strong>
 
               <small>
@@ -901,10 +775,8 @@ export default function Shared() {
             </article>
 
             <article>
-              <div className="shared-stat-icon cyan">
-                <Files
-                  size={20}
-                />
+              <div className="copper">
+                <Files size={20} />
               </div>
 
               <span>
@@ -912,9 +784,7 @@ export default function Shared() {
               </span>
 
               <strong>
-                {
-                  activeFileCount
-                }
+                {activeFileCount}
               </strong>
 
               <small>
@@ -923,10 +793,8 @@ export default function Shared() {
             </article>
 
             <article>
-              <div className="shared-stat-icon amber">
-                <Clock
-                  size={20}
-                />
+              <div className="amber">
+                <Clock size={20} />
               </div>
 
               <span>
@@ -934,9 +802,7 @@ export default function Shared() {
               </span>
 
               <strong>
-                {
-                  expiringSoonCount
-                }
+                {expiringSoonCount}
               </strong>
 
               <small>
@@ -945,7 +811,7 @@ export default function Shared() {
             </article>
 
             <article>
-              <div className="shared-stat-icon muted">
+              <div className="muted">
                 <ShieldCheck
                   size={20}
                 />
@@ -956,46 +822,44 @@ export default function Shared() {
               </span>
 
               <strong>
-                {
-                  expiredItems.length
-                }
+                {expiredItems.length}
               </strong>
 
               <small>
-                No longer public
+                No longer accessible
               </small>
             </article>
           </section>
 
-          <section className="shared-security-note">
+          <section className="az-shared-security">
             <div>
               <ShieldCheck
-                size={19}
+                size={20}
               />
             </div>
 
             <div>
               <strong>
-                Secure share links
+                Private by default
               </strong>
 
               <p>
-                CloudDrop stores only
-                a secure hash of each
-                share token. The
-                copyable public URL
-                is shown when a new
-                link is created from
-                File Details.
+                AzureDrop stores only
+                the secure hash of each
+                share token. Public
+                links expire
+                automatically and do
+                not make the underlying
+                Blob container public.
               </p>
             </div>
           </section>
 
-          <section className="shared-panel">
-            <div className="shared-panel-toolbar">
+          <section className="az-shared-panel">
+            <div className="az-shared-toolbar">
               <div>
                 <span>
-                  Link manager
+                  LINK MANAGER
                 </span>
 
                 <h2>
@@ -1003,57 +867,42 @@ export default function Shared() {
                 </h2>
 
                 <p>
-                  Inspect active and
-                  expired temporary
-                  links.
+                  Review temporary
+                  access to your files.
                 </p>
               </div>
 
-              <div className="shared-controls">
-                <div className="shared-filter">
-                  <select
-                    value={
-                      filter
-                    }
-                    onChange={(
-                      event
-                    ) =>
-                      setFilter(
-                        event
-                          .target
-                          .value
-                      )
-                    }
-                  >
-                    <option value="active">
-                      Active links
-                    </option>
+              <div className="az-shared-controls">
+                <select
+                  value={filter}
+                  onChange={(event) =>
+                    setFilter(
+                      event.target
+                        .value
+                    )
+                  }
+                >
+                  <option value="active">
+                    Active links
+                  </option>
 
-                    <option value="expired">
-                      Expired links
-                    </option>
+                  <option value="expired">
+                    Expired links
+                  </option>
 
-                    <option value="all">
-                      All links
-                    </option>
-                  </select>
-                </div>
+                  <option value="all">
+                    All links
+                  </option>
+                </select>
 
-                <div className="shared-search">
-                  <Search
-                    size={16}
-                  />
+                <div className="az-shared-search">
+                  <Search size={16} />
 
                   <input
-                    value={
-                      search
-                    }
-                    onChange={(
-                      event
-                    ) =>
+                    value={search}
+                    onChange={(event) =>
                       setSearch(
-                        event
-                          .target
+                        event.target
                           .value
                       )
                     }
@@ -1063,16 +912,11 @@ export default function Shared() {
                   {search && (
                     <button
                       type="button"
-                      aria-label="Clear search"
                       onClick={() =>
-                        setSearch(
-                          ""
-                        )
+                        setSearch("")
                       }
                     >
-                      <X
-                        size={14}
-                      />
+                      <X size={14} />
                     </button>
                   )}
                 </div>
@@ -1080,23 +924,22 @@ export default function Shared() {
             </div>
 
             {loading ? (
-              <div className="shared-empty-state">
-                <span className="shared-loader-ring" />
+              <div className="az-shared-empty">
+                <span className="az-shared-loader" />
 
                 <h3>
-                  Loading shared links
+                  Loading share links
                 </h3>
 
                 <p>
-                  Checking your secure
-                  CloudDrop sharing
-                  activity…
+                  Checking AzureDrop
+                  sharing activity…
                 </p>
               </div>
             ) : filteredItems.length ===
               0 ? (
-              <div className="shared-empty-state">
-                <div className="shared-empty-icon">
+              <div className="az-shared-empty">
+                <div>
                   <Share2
                     size={27}
                   />
@@ -1117,13 +960,12 @@ export default function Shared() {
                     : filter ===
                         "expired"
                       ? "Expired sharing links will appear here."
-                      : "Open a file from My Files and create a temporary link to share it securely."}
+                      : "Open a file from your dashboard and create a temporary link to share it securely."}
                 </p>
 
                 {filter !==
                   "expired" && (
                   <button
-                    className="shared-primary-button"
                     type="button"
                     onClick={() =>
                       navigate(
@@ -1140,13 +982,11 @@ export default function Shared() {
                 )}
               </div>
             ) : (
-              <div className="shared-list">
+              <div className="az-shared-list">
                 {filteredItems.map(
                   (item) => {
                     const expired =
-                      isExpired(
-                        item
-                      );
+                      isExpired(item);
 
                     const expiringSoon =
                       isExpiringSoon(
@@ -1155,55 +995,39 @@ export default function Shared() {
 
                     return (
                       <article
-                        className={`shared-item ${
+                        className={`az-share-item ${
                           expired
                             ? "expired"
                             : ""
                         }`}
-                        key={
-                          item.id
-                        }
+                        key={item.id}
                       >
-                        <div className="shared-item-main">
-                          <div className="shared-file-icon">
+                        <div className="az-share-file">
+                          <div>
                             <FileText
                               size={19}
                             />
                           </div>
 
-                          <div className="shared-file-copy">
-                            <strong
-                              title={
-                                item.file
-                                  .original_name
-                              }
-                            >
+                          <span>
+                            <strong>
                               {
                                 item.file
                                   .original_name
                               }
                             </strong>
 
-                            <span>
+                            <small>
                               {item.file
                                 .category ||
                                 "file"}
-
-                              {" • "}
-
-                              {item.file
-                                .storage_mode
-                                ?.toLowerCase()
-                                ?.includes(
-                                  "customer"
-                                )
-                                ? "My AWS"
-                                : "CloudDrop storage"}
-                            </span>
-                          </div>
+                              {" · "}
+                              Azure Blob
+                            </small>
+                          </span>
                         </div>
 
-                        <div className="shared-expiry">
+                        <div className="az-share-date">
                           <span>
                             Expires
                           </span>
@@ -1229,7 +1053,7 @@ export default function Shared() {
                           </small>
                         </div>
 
-                        <div className="shared-created">
+                        <div className="az-share-date">
                           <span>
                             Created
                           </span>
@@ -1241,24 +1065,22 @@ export default function Shared() {
                           </strong>
                         </div>
 
-                        <div className="shared-item-status">
-                          <span
-                            className={
-                              expired
-                                ? "expired"
-                                : "active"
-                            }
-                          >
-                            {expired
-                              ? "Expired"
-                              : "Active"}
-                          </span>
-                        </div>
+                        <span
+                          className={`az-share-status ${
+                            expired
+                              ? "expired"
+                              : "active"
+                          }`}
+                        >
+                          {expired
+                            ? "Expired"
+                            : "Active"}
+                        </span>
 
-                        <div className="shared-item-actions">
+                        <div className="az-share-actions">
                           <button
+                            className="manage"
                             type="button"
-                            className="shared-manage-button"
                             onClick={() =>
                               setSelectedFile(
                                 item.file
@@ -1277,8 +1099,8 @@ export default function Shared() {
                           </button>
 
                           <button
+                            className="revoke"
                             type="button"
-                            className="shared-revoke-button"
                             disabled={
                               revokingId ===
                               item.id
@@ -1311,23 +1133,14 @@ export default function Shared() {
 
       {selectedFile && (
         <FileDetailsModal
-          key={
-            selectedFile.id
-          }
+          key={selectedFile.id}
           open
-          file={
-            selectedFile
-          }
+          file={selectedFile}
           onClose={() =>
-            setSelectedFile(
-              null
-            )
+            setSelectedFile(null)
           }
           onDeleted={async () => {
-            setSelectedFile(
-              null
-            );
-
+            setSelectedFile(null);
             await refreshSharedItems();
           }}
         />

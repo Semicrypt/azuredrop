@@ -273,7 +273,7 @@ export default function UploadModal({
 
             <div>
               <span className="upload-modal-kicker">
-                CloudDrop storage
+                Azure Blob Storage
               </span>
 
               <h2
@@ -284,7 +284,7 @@ export default function UploadModal({
 
               <p>
                 Add a file to your
-                secure CloudDrop
+                secure AzureDrop
                 workspace.
               </p>
             </div>
@@ -316,10 +316,7 @@ export default function UploadModal({
             </strong>
 
             <p>
-              CloudDrop automatically
-              sends the upload to your
-              active storage
-              destination.
+              AzureDrop stores this upload in your private Azure Blob Storage container.
             </p>
           </div>
         </div>
