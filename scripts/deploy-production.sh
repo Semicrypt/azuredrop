@@ -20,6 +20,14 @@ if [[ ! -f "${ENV_FILE}" ]]; then
   exit 1
 fi
 
+if [[ ! -f /etc/letsencrypt/live/13.48.161.78/fullchain.pem ]] ||
+   [[ ! -f /etc/letsencrypt/live/13.48.161.78/privkey.pem ]]; then
+  echo "ERROR: AzureDrop TLS certificate is missing."
+  exit 1
+fi
+
+mkdir -p /var/www/certbot/.well-known/acme-challenge
+
 echo "Validating Docker Compose..."
 docker compose \
   --env-file "${ENV_FILE}" \
@@ -38,12 +46,18 @@ docker compose \
   -f "${COMPOSE_FILE}" \
   up -d --remove-orphans
 
-echo "Waiting for AzureDrop health check..."
+echo "Waiting for AzureDrop backend health check..."
 
 for attempt in $(seq 1 30); do
   HEALTH="$(
-    curl -fsS \
-      http://127.0.0.1/health \
+    docker compose \
+      --env-file "${ENV_FILE}" \
+      -f "${COMPOSE_FILE}" \
+      exec -T backend \
+      wget \
+        --quiet \
+        --output-document=- \
+        http://127.0.0.1:5000/health \
       2>/dev/null || true
   )"
 
