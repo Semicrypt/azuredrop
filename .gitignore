@@ -40,3 +40,4 @@ logs/
 
 # Keep production template in Git
 !.env.production.example
+*.tfplan

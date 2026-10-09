@@ -50,7 +50,18 @@ resource "aws_instance" "app" {
 
   key_name = aws_key_pair.app.key_name
 
+  iam_instance_profile = aws_iam_instance_profile.ec2_ssm.name
+
   associate_public_ip_address = false
+
+  # The instance receives its stable public address from aws_eip.app.
+  # Ignore provider drift on this ForceNew attribute so attaching the
+  # SSM instance profile does not recreate the production server.
+  lifecycle {
+    ignore_changes = [
+      associate_public_ip_address
+    ]
+  }
 
   root_block_device {
     volume_type = "gp3"

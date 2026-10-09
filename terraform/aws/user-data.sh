@@ -22,3 +22,10 @@ mkdir -p /opt/azuredrop
 
 chown ubuntu:ubuntu \
   /opt/azuredrop
+
+# AWS Systems Manager Agent for secure CI/CD deployments.
+if ! snap list amazon-ssm-agent >/dev/null 2>&1; then
+  snap install amazon-ssm-agent --classic
+fi
+
+snap start amazon-ssm-agent
