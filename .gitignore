@@ -36,3 +36,7 @@ terraform.rc
 # Logs
 *.log
 logs/
+.env.production
+
+# Keep production template in Git
+!.env.production.example
