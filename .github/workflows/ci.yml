@@ -218,7 +218,7 @@ jobs:
 
       EC2_INSTANCE_ID: i-0273193528e99575b
 
-      PUBLIC_HEALTH_URL: http://13.48.161.78/health
+      PUBLIC_HEALTH_URL: https://13.48.161.78/health
 
     steps:
       - name: Configure AWS credentials through OIDC
